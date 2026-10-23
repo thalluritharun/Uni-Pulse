@@ -1,0 +1,46 @@
+/* Focus studio: all colour tokens follow the workspace theme. */
+.focusx{display:grid;gap:20px;min-width:0}
+.focusx-intro{text-align:center;font-size:.88rem}
+.focusx-modes{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;background:var(--soft);border:1px solid var(--line);padding:6px;border-radius:15px}
+.focusx-modes button{padding:11px 5px;border-radius:10px;font-size:.8rem;font-weight:700;transition:background .2s,box-shadow .2s}
+.focusx-modes button small{display:block;font-size:.65rem;font-weight:500;margin-top:3px;opacity:.8}
+.focusx-modes button[aria-pressed=true]{background:var(--surface);color:var(--primary);box-shadow:0 2px 8px #30277812}
+.focusx-modes button:disabled[aria-pressed=true]{opacity:.85}
+.focusx-ring{--focus-angle:0deg;position:relative;display:grid;place-items:center;width:min(235px,100%);aspect-ratio:1;margin:2px auto;background:conic-gradient(var(--primary) var(--focus-angle),var(--line) 0);padding:9px;border-radius:50%;box-shadow:0 0 0 9px var(--soft)}
+.focusx-ring>div{background:var(--surface);height:100%;width:100%;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:9px}
+.focusx-ring .eyebrow{color:var(--primary)}
+.focusx-ring strong{font-family:var(--heading);font-size:clamp(2.8rem,9vw,3.4rem);font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:-2px;line-height:1.2}
+.focusx-ring-caption{font-size:.68rem;color:var(--muted)}
+.focusx-ring.is-running:after{content:'';position:absolute;inset:-10px;border:1px solid var(--primary);border-radius:50%;animation:focusx-breathe 4s ease-in-out 3;pointer-events:none;opacity:.2}
+.focusx-status{text-align:center;font-size:.78rem;color:var(--muted);min-height:2.5em;display:grid;place-items:center;margin:0!important}
+.focusx-controls{display:flex;justify-content:center;flex-wrap:wrap;gap:9px}
+.focusx [hidden]{display:none!important}
+.focusx-settings{padding:18px;border:1px solid var(--line);border-radius:16px;background:var(--bg);display:grid;gap:13px}
+.focusx-settings label{font-size:.75rem;font-weight:650;display:grid;gap:6px;min-width:0}
+.focusx-settings input{width:100%;min-width:0;font-size:.8rem;background:var(--surface)}
+.focusx-options{display:flex;gap:10px;align-items:end;flex-wrap:wrap}
+.focusx-options>label:first-child{flex:1;min-width:125px}
+.focusx-options .focusx-sound{display:flex;align-items:center;gap:7px;width:100%;font-weight:500;font-size:.75rem;margin-top:5px}
+.focusx-options input[type=checkbox]{width:17px;height:17px;min-height:0;padding:0;accent-color:var(--primary)}
+.focusx-settings .small{font-size:.68rem;line-height:1.65}
+.focusx-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.focusx-stats>div{padding:16px 7px;background:var(--soft);border-radius:13px;text-align:center}
+.focusx-stats strong{display:block;color:var(--primary);font-family:var(--heading);font-size:1.4rem;letter-spacing:-.7px;font-variant-numeric:tabular-nums}
+.focusx-stats strong small{font-size:.67rem;font-weight:500;letter-spacing:0}
+.focusx-stats span{display:block;font-size:.63rem;color:var(--muted);margin-top:4px}
+.focusx-history-head{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.focusx-history-head h3{font-size:.9rem}
+.focusx-history-head span{font-size:.68rem}
+.focusx-history{list-style:none;padding:0;margin:12px 0 0;display:grid;gap:8px}
+.focusx-history li{display:flex;align-items:center;gap:10px;border:1px solid var(--line);border-radius:11px;padding:11px}
+.focusx-history-icon{display:grid;place-items:center;flex-shrink:0;width:30px;height:30px;background:var(--soft);color:var(--primary);border-radius:9px}
+.focusx-history-icon svg{width:16px;height:16px}
+.focusx-history li>div{min-width:0;flex:1}
+.focusx-history strong{display:block;font-size:.76rem;overflow-wrap:anywhere}
+.focusx-history small{display:block;color:var(--muted);font-size:.63rem;margin-top:3px}
+.focusx-history li>b{font-size:.75rem;color:var(--primary);flex-shrink:0}
+.focusx-history-empty{font-size:.76rem;line-height:1.7;color:var(--muted);padding:17px 0 3px}
+.focusx-footnote{font-size:.65rem;color:var(--muted);line-height:1.7;border-top:1px solid var(--line);padding-top:14px;margin:0!important}
+@keyframes focusx-breathe{0%,100%{transform:scale(1);opacity:.2}50%{transform:scale(1.04);opacity:.45}}
+@media(max-width:400px){.focusx{gap:17px}.focusx-settings{padding:13px}.focusx-stats{gap:5px}.focusx-stats strong{font-size:1.2rem}.focusx-stats span{font-size:.59rem}.focusx-controls .btn{padding:11px 13px}.focusx-modes button{font-size:.72rem}.focusx-ring{width:205px}}
+@media(prefers-reduced-motion:reduce){.focusx-ring.is-running:after{animation:none}.focusx-modes button{transition:none}}

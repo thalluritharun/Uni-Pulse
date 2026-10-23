@@ -1,0 +1,765 @@
+A visual reference guide · 2026
+
+The Complete
+AI Ecosystem
+
+Data, Models, Local AI, Infrastructure, Applications, and Responsible AI
+
+01  02  03  04  05  06  07  08  09                                        10  11  12  13  14  15
+
+15 connected layers · from raw data to production, governed end to end
+Master ecosystem map · 15 layers
+
+How the 15 layers connect
+
+01                       02           03                         04                    05                                     06
+Data sources                          Storage & retrieval
+                         Ingestion &                             Quality, prep & data  AI & model                             Model families &
+                         integration                             governance            development                            capabilities
+
+12                       08                      07              13                                                           14
+                         Deployment & inference                  Connected systems
+Foundation, open-weight                          AI application                                                               People, users &
+& local models                                   architecture                                                                 industries
+
+09                                    10                                               11
+                                      Compute, cloud, hardware & infrastructure        AI tools & developer ecosystem
+MLOps, LLMOps & observability — the
+feedback loop back to 01
+
+15 · Governance, safety, security & responsible AI — a continuous control layer across every layer above, never a final step
+
+The Complete AI Ecosystem · 02
+The Complete AI Ecosystem
+
+SECTION 01
+
+Foundations
+
+The vocabulary of AI, and the parts every AI system is built from.
+
+The AI landscape · AI system architecture
+§1 Foundations                                                      Foundation models
+
+Understanding the AI landscape                                      Large models pre-trained on broad data, then adapted to many tasks. Most
+                                                                    generative AI is built on them.
+   Artificial intelligence — systems that perceive, reason, decide
+   or act                                                           LLMs and SLMs
+
+      Machine learning — learns patterns from data instead of       Large language models maximize capability. Small language models, typically a
+      hand-written rules                                            few billion parameters, trade breadth for speed, cost and on-device use.
+
+         Deep learning — many-layered neural networks               Traditional vs generative
+
+            Generative AI — creates new text, images, audio,        Traditional ML predicts or classifies — a fraud score, a demand forecast.
+            video and code                                          Generative AI produces new content. Real systems often combine both.
+
+   Takeaway — the terms nest; they are not synonyms. All generative AI is deep learning, but much production AI is still classical machine learning.
+The Complete AI Ecosystem · 04
+§1 Foundations
+
+AI system architecture
+
+Seven parts: data · models · orchestration · inference · application · users · governance
+
+Concept         What it is                                                              Example
+Model           Trained weights that turn inputs into outputs                           An open-weight LLM file; a fraud classifier
+Model API       A hosted endpoint that runs a model for you, billed per use             A provider’s chat or messages endpoint
+AI application  Software wrapping a model with prompts, data, interface and business    A support chatbot; a meeting summarizer
+                rules
+AI agent        An application where the model plans and acts through tools, in a loop  Triages tickets and updates the CRM
+AI platform     Shared infrastructure to build, serve, evaluate and govern many models  Managed hosting with evals, monitoring and
+                and apps                                                                access control
+
+   Takeaway — a model is a component, not a product. The application around it decides most of the quality, cost and risk.
+The Complete AI Ecosystem · 05
+The Complete AI Ecosystem
+
+SECTION 02 · LAYERS 01–04
+
+Data & Knowledge
+
+Where AI gets its raw material, and how that material becomes usable.
+
+Data sources · Ingestion · Storage · Retrieval stores · Preparation
+§2 Data & Knowledge · Layer 01
+
+Data sources and collection
+
+AI consumes five shapes of data: structured, semi-structured, unstructured, streaming and multimodal.
+
+Structured                              Semi-structured                         Unstructured
+
+MySQL · PostgreSQL · SQL Server · data  MongoDB · Cassandra · DynamoDB · JSON   Websites · PDFs · books · papers · code &
+warehouses · enterprise records         documents · application logs            docs · knowledge bases
+
+Multimodal                              Streaming                               Human & synthetic
+
+Images · video · audio · speech ·       APIs · telemetry · event streams · IoT  User content & feedback · open datasets ·
+scanned documents                       sensors · edge systems                  synthetic data · simulations
+
+   Takeaway — know each source’s owner, license and refresh rate before it feeds a model; those three decide what you may build on it.
+The Complete AI Ecosystem · 07
+§2 Data & Knowledge · Layer 02
+
+Data ingestion, ETL/ELT and streaming
+
+Ingestion moves data from sources into storage, checking it on the way in.
+
+Source  →  Extract                 →  Validate                       →  Transform  →                     Load              →  Catalog
+
+Batch                              Real-time                            Connectors                                         Controls
+
+Scheduled bulk loads. ETL          Streaming, Change Data               API integrations, web crawling,                    Schema enforcement,
+transforms before loading; ELT     Capture from databases, event-       document ingestion. AWS Glue ·                     validation, deduplication, data
+loads first and transforms in the  driven pipelines. Apache Kafka ·     Azure Data Factory · Google                        contracts, lineage and
+warehouse. Spark · Airflow · dbt   Apache Flink                         Cloud Dataflow                                     provenance
+
+   Takeaway — reject bad data at the door. Every record that slips past validation can resurface later as a wrong answer.
+The Complete AI Ecosystem · 08
+§2 Data & Knowledge · Layer 03
+
+Data lakes, lakehouses, warehouses and databases
+
+Store               Best for                                               Examples
+Object storage      Raw files, model artifacts, backups at any scale       Amazon S3 · Azure Blob · Google Cloud Storage
+Lake / lakehouse    Open-format files with table features and big compute  Databricks · Apache Iceberg tables
+Data warehouse      Governed analytical SQL and BI                         Snowflake · BigQuery · ClickHouse
+Relational / NoSQL  Exact, transactional application records               PostgreSQL · MySQL · MongoDB · Redis
+Time-series         Metrics and sensor readings over time                  TimescaleDB · InfluxDB
+Feature store       The same ML features for training and serving          Feast
+Metadata catalog    Discovery, ownership, lineage, access policy           Unity Catalog · DataHub
+
+   Takeaway — pick storage by access pattern: files, analytics or transactions. Retention rules and access control apply to all of them.
+The Complete AI Ecosystem · 09
+§2 Data & Knowledge · Layer 03
+
+Vector, search, graph and SQL stores are not interchangeable
+
+Each answers a different kind of question. Most RAG systems combine two or more.
+
+Vector database             Full-text search            Graph database                   Relational / SQL
+
+Finds similar meaning       Finds exact words, ranked   Finds relationships across hops  Finds exact records and totals
+                            “error code E-4031”                                          “refunds in March by region”
+“passages about             Elasticsearch · OpenSearch  “which suppliers feed recalled   PostgreSQL · MySQL
+refund disputes”                                        products?”
+
+Qdrant · Milvus · Weaviate                              Neo4j · Amazon Neptune ·
+· pgvector                                              knowledge graphs
+
+   Takeaway — hybrid search (vector + keyword) is the common default; object storage keeps the original files these indexes point to.
+The Complete AI Ecosystem · 10
+§2 Data & Knowledge · Layer 04
+
+Data quality, preparation and governance
+
+Clean                    Shape              Index          Protect              Trust                                         Split
+
+Normalize,               Tokenize, label,   Parse, chunk,  Redact PII, control  Check bias, license,                          Train, validation,
+deduplicate,             engineer features  generate       access, retain       provenance                                    test; version it
+test quality                                embeddings
+
+Purpose                  Data needed                       Key preparation
+Classical ML             Labeled tables                    Features, labels, leak-free splits
+Foundation pre-training  Trillions of tokens               Filtering, deduplication, contamination checks, licensing
+Fine-tuning              Curated examples                  Instruction and preference pairs, PII removal, versioning
+RAG                      Your documents                    Parsing, chunking, embeddings, metadata and access tags
+
+   Takeaway — preparation depends on the goal: training needs scale and cleanliness; RAG needs good parsing and permissions.
+The Complete AI Ecosystem · 11
+The Complete AI Ecosystem
+
+SECTION 03 · LAYERS 05, 06, 12
+
+Models & Training
+
+How models are built, adapted, chosen and accessed.
+
+Development · Training pathways · RAG vs fine-tuning · Model families · Multimodal · Model access
+§3 Models & Training · Layer 05
+
+The model development lifecycle
+
+01                             02                           03                               04
+
+Define                         Explore                      Engineer                         Train or adapt
+
+Problem, success metric and a  Statistical analysis, EDA,   Features and labels, or prompts  Supervised, unsupervised, self-
+simple baseline                data checks                  and context                      supervised or RL
+
+05                             06                           07                               08
+
+Tune                           Evaluate                     Register                         Optimize
+
+Hyperparameter search,         Held-out tests, task evals,  Approval, model registry,        Distill or quantize, then hand off
+tracked experiments            safety and bias checks       versioned artifacts              to serving
+
+   Takeaway — start from a baseline and a metric. Without them you cannot tell whether a bigger model or more training actually helped.
+The Complete AI Ecosystem · 13
+§3 Models & Training · Deep dive 4.4
+
+Six ways to get a working model
+
+Workflow            Compute                              Data                             Watch for
+Train from scratch  Large GPU or TPU clusters, weeks to  Billions to trillions of tokens  Checkpointing, evals at scale, data licensing
+                    months
+Full fine-tune      Several GPUs, hours to days          Thousands or more examples       Base-model license, forgetting old skills
+PEFT: LoRA, QLoRA   One or a few GPUs                    Hundreds to thousands of         Small adapters; QLoRA trains on a 4-bit base
+                                                         examples
+RAG                 Embedding and inference only         Your documents                   Retrieval quality, freshness, permissions
+Prompt-only         Inference only                       A few examples                   Fastest start; capped by the base model
+Distill, quantize   Teacher inference plus student       Teacher outputs                  Quality loss; terms on using teacher outputs
+                    training
+
+The Complete AI Ecosystem · 14
+§3 Models & Training · Deep dive 4.1
+
+Prompting, RAG, fine-tuning or long context?
+
+Changes    Prompting             RAG                           Fine-tuning                                      Long context
+Best for   Instructions only     Knowledge at query time       Behavior, format, style                          How much fits in one request
+           Quick, general tasks  Private, changing facts with  Consistent output and                            A few large documents
+Freshness                        citations                     domain skills
+Cost       Instant               As fresh as the index         Frozen at training time                          Per request
+Main risk  Lowest                Indexing plus retrieval       Training run plus hosting                        Many tokens per call
+           Brittle prompts       Poor retrieval, wrong         Stale facts, lost skills                         Cost; details lost mid-context
+                                 answers
+
+   Takeaway — use RAG for what the model should know, fine-tuning for how it should behave. They combine well.
+The Complete AI Ecosystem · 15
+§3 Models & Training · Layer 06
+
+Model families: general-purpose and specialized
+
+General-purpose                 Perception                  Generation                  Retrieval
+
+Large language models           Vision · detection &        Text-to-speech · image ·    Text and image embeddings
+Small language models           segmentation · speech       video · diffusion models    · rerankers
+Multimodal models               recognition
+Code-generation models                                      Ranking & graph             Physical
+                                Predictive
+One model, many tasks, steered                              Recommendation & ranking ·  Robotics & action ·
+by prompts.                     Classification ·            graph ML                    geospatial · scientific
+                                regression · forecasting ·
+                                anomaly detection
+
+   Takeaway — specialized models are usually smaller, cheaper and more accurate on their one task; general models trade that for breadth.
+The Complete AI Ecosystem · 16
+§3 Models & Training · Deep dive 4.5
+
+Multimodal AI
+
+Encoders turn each input into tokens or embeddings that one model can reason over.
+
+Text                     Encoders                  Embeddings            Fusion                Decoders
+Images            → One per modality,       → A shared             → Attention across   → Text, speech, image
+Audio & speech
+Video                      plus tokenizers           vector space           modalities           or video out
+Documents
+Sensors & motion
+
+   Takeaway — support varies by model: many read images but cannot produce them. Check each model’s input and output modalities.
+The Complete AI Ecosystem · 17
+§3 Models & Training · Layer 12
+
+Four ways to access a foundation model
+
+Examples   A · Proprietary API     B · Open-weight           C · Local                                                      D · Cloud-hosted open
+Runs on                                                      Ollama · LM Studio ·                                           Bedrock · Microsoft Foundry ·
+           OpenAI GPT · Anthropic  Llama · Qwen · Mistral ·  llama.cpp · MLX                                                Vertex AI · Together
+           Claude · Google Gemini  DeepSeek · Gemma · Phi    Your own machine                                               A managed host or your
+                                                                                                                            cloud GPUs
+           The provider’s cloud    Wherever you choose       Hardware you own                                               Per token or GPU-hour
+
+Pricing    Per token               Free weights; you pay     Data stays on device                                           Depends on the host
+                                   compute                   RAM and VRAM limits                                            Region, SLAs, egress
+Privacy    Provider terms apply
+Watch for  Lock-in, deprecations   Full control of weights
+
+                                   License terms vary
+
+   Takeaway — open-weight describes the license, not the location. The same model can run on a laptop or in a data center.
+The Complete AI Ecosystem · 18
+§3 Models & Training · Layer 12B
+
+Open-weight model families and their licenses
+
+Family    Developer   Typical license                     Notes
+Llama     Meta        Llama community license (custom)    Use policy; extra terms for huge services
+Qwen      Alibaba     Mostly Apache 2.0                   Wide size range; multilingual, coding
+Mistral   Mistral AI  Apache 2.0 for many; others custom  Check each model’s terms
+DeepSeek  DeepSeek    MIT for recent releases             Reasoning; mixture-of-experts
+Gemma     Google      Gemma terms of use (custom)         Small to mid sizes; on-device
+Phi       Microsoft   MIT                                 Small language models
+gpt-oss   OpenAI      Apache 2.0                          Open-weight reasoning models
+OLMo      Ai2         Apache 2.0                          Fully open: weights, data, code
+
+The Complete AI Ecosystem · 19 · Licenses change: verify each model and version
+The Complete AI Ecosystem
+
+SECTION 04 · LAYER 12C
+
+Local AI
+
+Running models on your own laptops, workstations and servers.
+
+Tools and runtimes · Local architecture · Hardware and memory
+§4 Local AI · Layer 12C
+
+Local AI tools play different roles
+
+Tool           Role                      Best for
+LM Studio      Desktop app               Browse, download and chat with models
+Jan · GPT4All  Desktop apps              Private offline chat, local documents
+Ollama         Model manager, local API  One-command models with a localhost API
+LocalAI        Local API server          OpenAI-compatible API over many backends
+llama.cpp      Inference runtime         GGUF models on CPU, Metal, CUDA, ROCm
+MLX            Apple Silicon runtime     Fast inference and fine-tuning on Macs
+Transformers   Python library            Research, custom pipelines, fine-tuning
+vLLM · SGLang  Production serving        High-throughput, multi-user GPU serving
+
+   Takeaway — apps sit on top of runtimes: LM Studio and Ollama both build on llama.cpp-style engines.
+The Complete AI Ecosystem · 21
+§4 Local AI · Deep dive 4.3
+
+Local AI architecture
+
+Interface → Local app →                         Local API   Model load                      Hardware                                   Output
+                                                runtime on
+chat, IDE, app  LM Studio, Jan                   localhost  → GGUF or MLX → CPU, GPU, Apple →                                          on your device
+
+                                                            weights                         Silicon
+
+Optional add-ons                                Fully offline                               May go online
+
+Local embeddings · local vector database ·      Inference · embeddings · vector search and  Model downloads and updates · telemetry ·
+document ingestion · local RAG · local tools ·  RAG over local files                        web tools · remote API fallback
+app integrations
+
+   Takeaway — “local” is a privacy boundary. Check each app’s telemetry and fallback settings before trusting it with sensitive data.
+The Complete AI Ecosystem · 22
+§4 Local AI · Hardware
+
+How much memory a local model needs
+
+Memory ≈ parameters × bytes per weight, plus room for context (KV cache).
+
+Model size     16-bit     8-bit  4-bit (GGUF)    Typically fits on
+3–4B           ~8 GB    ~4 GB         ~2–3 GB    Most laptops, CPU-only machines, some phones
+7–8B         ~16 GB     ~8 GB             ~5 GB  16 GB laptops, entry-level GPUs
+13–14B       ~28 GB    ~14 GB         ~8–9 GB    16 GB+ Macs, 12–16 GB GPUs
+30–32B       ~64 GB    ~32 GB                    24 GB GPUs, 32 GB+ Macs
+70B         ~140 GB    ~70 GB      ~18–20 GB     48 GB+ GPUs, 64 GB+ Macs, workstations
+                                        ~40 GB
+
+   Takeaway — 4-bit quantization is the usual sweet spot. Weights-only figures: leave headroom for long context.
+The Complete AI Ecosystem · 23
+The Complete AI Ecosystem
+
+SECTION 05 · LAYERS 07, 13, 14
+
+Applications, RAG & Agents
+
+How models become products that people and systems actually use.
+
+App architecture · App types · RAG · Agents · Connected systems · People
+§5 Applications · Layer 07
+
+Inside an AI application
+
+ User interface            Guardrails           Orchestrator               Memory          The orchestrator
+chat · voice · app  input & output checks                           short- & long-term     assembles context, calls
+                                              system prompt                                the model and runs
+                                           conversation context           Retrieval        permitted tools.
+                                                                 vector · keyword · graph
+                                              state & policies                                  External systems
+                                                 tool routing                Model              APIs · permissions
+                                                                 LLM · SLM · multimodal
+
+                                                                             Tools
+                                                                     registry · sandbox
+
+   Takeaway — the model is one box of many. Quality and safety come from how the orchestrator, retrieval and guardrails are built.
+The Complete AI Ecosystem · 25
+§5 Applications · Layer 07
+
+Not every chatbot is an agent; not every app is RAG
+
+Each step adds one capability, and with it more power and more risk.
+
+Type         Adds                                Example                               Takes actions?
+Chatbot      Model, system prompt, conversation  FAQ assistant                         No
+RAG app      Retrieval and citations             Policy Q&A over company docs          No
+Copilot      In-product context and suggestions  Code completion in an IDE             No — the person acts
+Agent        Tools, planning, an action loop     Resolves a support ticket end to end  Yes, within permissions
+Multi-agent  Several agents and a coordinator    Research, draft, review pipeline      Yes, coordinated
+
+   Takeaway — choose the simplest type that solves the problem. Autonomy should be earned through evaluation, not assumed.
+The Complete AI Ecosystem · 26
+§5 Applications · Deep dive 4.1
+
+The Retrieval-Augmented Generation pipeline
+
+INDEXING · AHEAD OF TIME
+
+Sources  →  Ingest          →       Parse  →  Chunk  →  Embed                                                                    →  Index
+
+QUERY TIME · EVERY REQUEST
+
+Query    → Retrieve →       Rerank  → Build context → Generate → Check citations →                                                  Answer
+
+   Takeaway — most RAG failures are retrieval failures. If the right passage never reaches the model, no model can answer well.
+The Complete AI Ecosystem · 27
+§5 Applications · Deep dive 4.1
+
+Techniques that make retrieval work
+
+Dense retrieval          Sparse retrieval      Hybrid search             Metadata filters          Query rewriting
+                                                                                                   Clarify the question;
+Embeddings match         Keyword scoring for   Dense and sparse results  Limit by date, source or  run variants
+meaning, not words       exact terms           combined                  permission
+                                                                                                   Retrieval evals
+Reranking                Graph retrieval       Compression               Citation checks           Recall, precision,
+                                                                                                   faithfulness
+A second model reorders  Follows entity links  Trims context to          Each claim backed by
+top hits                 across hops           what matters              a source
+
+   Takeaway — measure retrieval separately from generation. A labeled set of questions and correct sources is the most valuable RAG asset.
+The Complete AI Ecosystem · 28
+§5 Applications · Deep dive 4.2
+
+The agent loop
+
+01                  → 02                  → 03                       → 04                                         → 05
+User request
+                           Plan the task         Select a tool              Check permission                             Execute
+
+06                  → 07                  → 08                       → 09                                         → 10
+Observe the result
+                           Update state          Choose next action         Verify the outcome                           Done, or ask a human
+
+↺ Steps 02–08 repeat until the goal is verified or a budget, time or iteration limit is reached.
+
+   Takeaway — the permission check (04) and verification (09) are what separate a useful agent from a risky one.
+The Complete AI Ecosystem · 29
+§5 Applications · Deep dive 4.2
+
+What a production agent needs
+
+Component                        Why it matters
+Function calling, tool registry  The model chooses only from declared, typed tools
+Scoped permissions               Least privilege per tool and per user
+Sandboxed execution              Generated code runs isolated from real systems
+Human approval                   Required for irreversible or high-impact actions
+Memory and state                 Resume work and carry context across steps
+Workflow graphs                  Fixed steps where reliability matters more than freedom
+Retries, timeouts, budgets       Caps on iterations, spend and time
+Audit logging                    Every plan, tool call and result recorded
+Evaluation and red teaming       Test task success and misuse before release
+
+   Takeaway — give agents the narrowest permissions that still get the job done, and log everything they do.
+The Complete AI Ecosystem · 30
+§5 Applications · Layer 13
+
+Connected systems and enterprise applications
+
+AI application         Integration layer                         CRM        ERP        Payments
+    or agent                                                                Calendar   Support
+                         APIs and connectors (e.g. MCP)          Email      Wikis      Identity
+                                                                            Dev tools  SecOps
+                ↔ Scoped permissions                     ↔
+
+                         Business rules                          Documents
+                         Audit trail
+                                                                 BI
+
+Across industries — software engineering · education · healthcare · finance · manufacturing · retail & e-commerce · government & public services
+
+   Takeaway — the AI should act with the user’s permissions, never more, and every write to a business system should leave an audit trail.
+The Complete AI Ecosystem · 31
+§5 Applications · Layer 14
+
+People, users and industries
+
+Builders                         Business                      Domain teams                  Everyone
+
+Software engineers · AI/ML       Business analysts ·           Healthcare · finance ·        Students and educators ·
+engineers · data scientists ·    product managers · owners     manufacturing · security      everyday users
+data engineers · researchers     and executives                · customer support ·
+                                                               public sector                 Oversight
+HOW PEOPLE SHAPE AI              Feedback
+                                                               Expertise                     Approvals and accountability
+  Requirements                   Ratings and corrections feed
+                                 Layer 09                      Labels, evals and edge cases
+   Define what a good result is
+
+The Complete AI Ecosystem · 32
+The Complete AI Ecosystem
+
+SECTION 06 · LAYERS 08–11
+
+Production & Infrastructure
+
+Serving models reliably, watching them, and the compute underneath.
+
+Deployment · Serving · MLOps · Observability · Compute · Compute stack · Developer tools
+§6 Production · Layer 08
+
+Deployment and inference: where models run
+
+Exposed through REST or GraphQL APIs, streaming or batch, behind authentication, rate limits and quotas.
+
+Option                  Runs in                    Choose when
+Cloud inference API     Provider data centers      Fastest start; frontier models
+Self-hosted in cloud    Your cloud GPUs            Open models, control, steady high volume
+On-prem, private cloud  Your data center           Data residency or strict regulation
+Local PC, workstation   The user’s machine         Privacy, offline use, prototyping
+Edge and mobile         Phones, cameras, vehicles  Low latency or no connectivity
+
+   Takeaway — many teams mix options: a cloud API for hard tasks, a small self-hosted or local model for cheap, private or offline ones.
+The Complete AI Ecosystem · 34
+§6 Production · Layer 08
+
+Efficient serving, and why training is different
+
+Batching          Caching         Quantization                Routing            Autoscaling        Fallbacks
+Share GPU passes  Reuse prompts,  Fewer bits                  Small model first  Load-balanced      Backup model
+                  results         per weight                                     replicas           on failure
+
+Goal              Training infrastructure                     Inference infrastructure
+Hardware          Throughput over long jobs                   Low latency per request
+Load              Multi-node GPU clusters, fast interconnect  Right-sized GPUs, CPUs or edge chips
+Bottleneck        Scheduled runs lasting days or weeks        Always on, follows user traffic
+Cost lever        Compute and interconnect                    Memory and the KV cache
+                  Utilization, checkpointing                  Batching, caching, quantization
+
+The Complete AI Ecosystem · 35
+§6 Production · Layer 09
+
+MLOps and LLMOps: the continuous improvement loop
+
+Data  →                           Develop  →  Evaluate               →  Deploy  →                       Monitor          →  Feedback
+
+↺ Feedback returns to Data — the loop never ends while the system is live.
+
+Build                                      Evaluate                     Release                         Respond
+
+CI/CD · infrastructure as code ·           Offline and online evals     Canary deployments · A/B tests  Incident response · model
+versioned models, datasets,                · regression tests ·         · fast rollbacks                retirement and replacement
+prompts, configs                           factuality checks
+
+   Takeaway — version prompts like code. In LLM apps a one-line prompt change can shift quality as much as a new model.
+The Complete AI Ecosystem · 36
+§6 Production · Layer 09
+
+What to observe in production
+
+Signal      What to track                             Why
+Latency     Time to first token, total response time  User experience
+Throughput  Requests and tokens per second            Capacity planning
+Cost        Tokens and GPU-hours per task             Unit economics
+GPU use     Memory and compute utilization            Right-sizing
+Quality     Eval scores, hallucination checks         Catch regressions
+Retrieval   Hit rate, source relevance                RAG health
+Drift       Shifts in inputs and outputs              Retraining triggers
+Feedback    Ratings, corrections, escalations         Ground truth
+Traces      Prompts, tool calls, responses            Debugging, audits
+
+   Takeaway — track cost per successful task, not just cost per token; a cheap model that fails often is expensive.
+The Complete AI Ecosystem · 37
+§6 Production · Layer 10
+
+Compute, cloud, hardware and infrastructure
+
+Cloud providers                        Compute                                Vendors
+
+AWS · Microsoft Azure · Google Cloud   CPUs · GPUs · TPUs · NPUs · other      NVIDIA · AMD · Intel · Google TPU · Apple
+· Oracle Cloud · GPU clouds such       accelerators · multi-GPU, multi-       Silicon · AWS Trainium · Cerebras
+as CoreWeave                           node clusters
+                                                                              Operations
+Platform                               Security
+                                                                              Autoscaling · monitoring · cost management
+VMs · Docker containers · Kubernetes   IAM · secrets management · backup and  and FinOps
+· serverless · storage · networking ·  disaster recovery
+load balancers
+
+   Takeaway — GPU capacity is often the scarcest resource. Plan availability, region and cost before choosing a model size.
+The Complete AI Ecosystem · 38
+§6 Production · Layer 10
+
+The AI compute stack, from silicon to application
+
+Applications          APIs · apps · agents
+
+Model serving         vLLM · SGLang · NVIDIA Triton · Ollama
+
+Inference runtimes    TensorRT · ONNX Runtime · OpenVINO · MLX · llama.cpp
+
+ML frameworks         PyTorch · JAX · TensorFlow
+
+Compute platforms     CUDA (NVIDIA) · ROCm (AMD) · Metal (Apple) · oneAPI (Intel)
+
+Drivers and firmware  Vendor GPU and NPU drivers
+
+Hardware              CPU · GPU · TPU · NPU
+
+   Takeaway — each layer depends on the one below. A runtime that lacks support for your hardware rules out that hardware.
+The Complete AI Ecosystem · 39
+§6 Production · Layer 11
+
+AI tools and the developer ecosystem
+
+Category        Examples                                  Category          Examples
+Environments    Python · Jupyter · VS Code · Git          Prompts           MLflow · Langfuse prompt registries
+Hugging Face    Hub · Transformers · Datasets · PEFT ·    Vector search     Qdrant · Milvus · Weaviate · pgvector ·
+                Accelerate                                                  FAISS
+Frameworks      PyTorch · TensorFlow · JAX                Annotation        Label Studio · Argilla
+Experiments     MLflow · Weights & Biases                 Synthetic data    Distilabel
+Orchestration   Airflow · Kubeflow · Prefect · Dagster    Serving           vLLM · SGLang · Triton · Ray Serve ·
+App frameworks  LangChain · LangGraph · LlamaIndex ·                        BentoML
+                Haystack                                  Observability     Arize Phoenix · Langfuse · OpenTelemetry
+Evaluation      lm-evaluation-harness · Ragas · DeepEval  Security testing  garak · PyRIT · promptfoo
+
+   Takeaway — tools change fast; the categories don’t. Choose by category need first, then compare current tools.
+The Complete AI Ecosystem · 40
+The Complete AI Ecosystem
+
+SECTION 07 · LAYER 15
+
+Trust, Security & Economics
+
+The controls that span every layer, and what the whole system costs.
+
+Governance · Security and red teaming · Economics and sustainability
+§7 Trust · Layer 15
+
+Governance is a control layer, not a final step
+
+Every stage of the lifecycle carries its own controls.
+
+Stage                    Controls
+Data · 01–04             Privacy and consent, PII redaction, licensing, provenance, retention
+Models · 05, 06, 12      Fairness and bias tests, model documentation, license checks, model risk review
+Applications · 07, 13    Prompt-injection defenses, content safeguards, least privilege, human oversight
+Infrastructure · 08, 10  Identity and access, encryption, secrets management, vendor risk, energy use
+Operations · 09          Audit trails, AI incident response, monitoring, regulatory compliance
+People · 14              Transparency, explainability, accessibility, training for users
+
+   Takeaway — retrofitting governance costs far more than designing it in. Assign an owner for each control at each stage.
+The Complete AI Ecosystem · 42
+§7 Trust · Deep dive 4.6
+
+AI security threats and defenses
+
+Threat              What happens                         Defense
+Prompt injection    Input overrides instructions         Separate instructions from data; least privilege
+Indirect injection  Hidden orders in retrieved content   Treat retrieved text as data; tool allow-lists
+Jailbreaks          Users bypass safety policies         Safety training, classifiers, red teaming
+Data leakage        Secrets or PII in outputs            Redaction, access-aware retrieval, scanning
+Poisoning           Tampered training or retrieval data  Provenance, validation, trusted sources
+Model extraction    Queries used to copy a model         Rate limits, abuse monitoring
+Agent misuse        Harmful tool calls, untrusted code   Permissions, approval, sandboxes
+Supply chain        Unsafe model files or packages       Trusted registries, safetensors, scanning
+Denial of service   Costly prompts exhaust capacity      Quotas, timeouts, input limits
+
+The Complete AI Ecosystem · 43
+§7 Trust · Deep dive 4.7
+
+AI economics: cloud versus self-hosted cost
+
+Drivers: training · inference · tokens · GPU use · storage · network · energy · licenses
+
+Upfront      Cloud API                  Self-hosted or local
+Per use      None                       Hardware or reserved GPUs
+Scaling      Price per token            Electricity and operations time
+Utilization  Instant and elastic        Limited by capacity you own
+Licensing    Pay only for what you use  Idle hardware still costs money
+Best when    Included in the price      Model license terms apply
+             Spiky volume, top quality  Steady high volume, privacy, offline
+
+   Takeaway — compare cost per successful task. A larger model that succeeds first time can beat a cheaper one that needs retries.
+The Complete AI Ecosystem · 44
+The Complete AI Ecosystem
+
+SECTION 08
+
+Frontier & Reference
+
+What is emerging, two end-to-end architectures, and a glossary.
+
+Emerging AI · Enterprise reference architecture · Local reference architecture · Glossary
+§8 Frontier · Deep dive 4.8
+
+Emerging and specialized AI, by maturity
+
+IN PRODUCTION             EARLY DEPLOYMENTS         RESEARCH
+
+Established               Emerging                  Speculative
+
+On-device AI              Robotics and embodied AI  General world models
+Time-series intelligence  Scientific AI             Open-ended autonomous agents
+Graph learning            AI for drug discovery     General-purpose robots
+Geospatial AI             Privacy-preserving ML
+AI-assisted coding        Simulation for training
+Federated learning        Autonomy in set domains
+
+   Takeaway — judge new categories by evidence of deployment, not demos. Maturity labels shift every year.
+The Complete AI Ecosystem · 46
+§8 Reference architecture A
+
+An enterprise knowledge assistant, layer by layer
+
+Layer           Choice in this design
+01 Sources      Wikis, PDFs, support tickets, CRM records
+02–04 Prepare   Nightly sync plus CDC, parsing, chunking, PII redaction, permission tags
+03 Store        Object storage for files; hybrid vector and keyword index
+12 Models       Proprietary API for hard questions; small open model for routing
+07 Application  RAG with citations; ticket-creation tool behind human approval
+08 Serving      API gateway, streaming responses, caching, rate limits
+13 Connected    SSO identity, CRM and ticketing via connectors, audit log
+09 Operations   Traces, retrieval evals, feedback buttons, cost per answer
+15 Governance   Access-aware retrieval, injection defenses, retention, incident runbook
+
+   Takeaway — users only ever see answers drawn from documents they are already allowed to open.
+The Complete AI Ecosystem · 47
+§8 Reference architecture B
+
+A private assistant that runs on one laptop
+
+Hardware                     Runtime                Models         Knowledge                                             Interface
+
+32 GB Apple Silicon  → Ollama or LM Studio  → 7–14B chat model at  → Local vector store over → Desktop chat with
+Mac or 12 GB+ GPU                                                  your folders                                          document upload
+                             local API              4-bit, local
+                                                    embeddings
+
+Stays on the device                                       Decide deliberately
+
+Prompts, documents, embeddings, answers and chat history  Model downloads, app updates, telemetry, web search, cloud fallback
+
+   Takeaway — local trades peak quality for privacy and zero per-token cost; it suits drafting, search and summarizing.
+The Complete AI Ecosystem · 48
+§8 Reference      Meaning                                         Term           Meaning
+                  A word piece; the unit models read and bill by  LoRA, QLoRA    Fine-tuning small adapter weights only
+Glossary          A vector capturing meaning, used for search     RAG            Retrieving documents to ground an answer
+                  How many tokens one request can hold            Reranker       Model that reorders search results by relevance
+  Term            Memory of processed tokens during generation    Hallucination  Fluent output that is not supported by facts
+  Token           Storing weights in fewer bits to save memory    Agent          A model that plans and acts with tools in a loop
+  Embedding       File format for quantized local models          MCP            Model Context Protocol, an open connector
+  Context window                                                                 standard
+  KV cache
+  Quantization
+  GGUF
+
+The Complete AI Ecosystem · 49
+The Complete AI Ecosystem
+
+Five things to remember
+
+01 Data quality and permissions decide most outcomes.
+02 Start light: prompting, then RAG, then fine-tuning.
+03 Open-weight is a license; local is a location.
+04 Agents need narrow permissions, limits and verification.
+05 Governance and feedback run through every layer, all the time.
+

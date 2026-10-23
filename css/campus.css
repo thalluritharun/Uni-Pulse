@@ -1,0 +1,24 @@
+.auth-form h2{font-size:clamp(1.65rem,2.4vw,2rem);line-height:1.35;max-width:420px}
+.campus-banner{background:linear-gradient(120deg,#302778,#5c4ccc);color:#fff;padding:26px;border-radius:22px;margin-bottom:24px}
+.campus-banner h2{font-size:1.35rem;margin:7px 0 12px}.campus-banner p{font-size:.85rem;color:#e5dffc}
+.exam-strip{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-top:20px}
+.exam-day{padding:15px;border-radius:14px;border:1px solid #ffffff30;background:#ffffff0b}
+.exam-day strong,.exam-day small{display:block}.exam-day strong{font-size:.9rem}.exam-day small{font-size:.73rem;color:#e5dffc;margin-top:6px}
+.report-mode{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px}.report-mode button[aria-pressed=true]{background:var(--primary);color:var(--surface)}
+.report-insight{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin-bottom:22px}
+.report-insight .card{padding:22px}.report-insight h3{margin-bottom:8px}.report-insight p{color:var(--muted);font-size:.85rem}
+.subject-scores{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin-bottom:24px}
+.score-card h3{font-size:.85rem;margin:12px 0}.score-line{display:flex;justify-content:space-between;gap:12px;font-size:.8rem;padding:8px 0;border-top:1px solid var(--line)}
+.notification-link{position:relative}.notification-count{position:absolute;right:-5px;top:-6px;min-width:19px;height:19px;padding:0 4px;border-radius:20px;background:#c33b66;color:white;font-size:.62rem;display:grid;place-items:center;border:2px solid var(--surface)}
+.notification-card{display:grid;grid-template-columns:42px minmax(0,1fr);gap:16px;border-left:3px solid var(--primary)}
+.notification-card.is-read{border-left-color:var(--line)}.notification-card h3{margin:10px 0}.notification-card p{color:var(--muted);font-size:.88rem;line-height:1.8;white-space:pre-wrap;overflow-wrap:anywhere}
+.notification-card .row{margin-top:14px}.notification-card .notification-meta{margin-top:0;font-size:.7rem;color:var(--muted)}
+/* Let source tables scroll inside the reader without widening its grid track. */
+.learning-layout>*{min-width:0}
+.lesson-companion{margin-top:24px;padding:22px;border-radius:18px;background:var(--soft)}
+.lesson-companion h3{margin-bottom:9px}.lesson-companion p{font-size:.85rem;color:var(--muted);margin-bottom:16px}
+.lesson-companion .row{gap:10px}.source-copy{white-space:pre-wrap;overflow-wrap:anywhere;font-family:var(--body);line-height:1.9;font-size:.92rem}
+[data-theme=dark] .report-mode button[aria-pressed=true]{color:#272047}
+@media(max-width:1000px){.subject-scores{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:720px){.exam-strip{grid-template-columns:repeat(2,minmax(0,1fr))}.report-insight,.subject-scores{grid-template-columns:1fr}.campus-banner{padding:22px}.notification-card{padding:18px;grid-template-columns:30px minmax(0,1fr)}.notification-card>.tile-icon{width:30px;height:30px}.report-mode .btn{flex:1}}
+@media print{.report-mode,.notification-count{display:none!important}.subject-scores{grid-template-columns:repeat(2,1fr)}.campus-banner{background:white;color:black}.campus-banner p{color:black}}

@@ -1,0 +1,51 @@
+/* Original course material with a quiet, accessible reading workspace. */
+@font-face{font-family:"Source Symbols";src:local("Symbol");unicode-range:U+F0B7;font-display:swap}
+.learning-source{--source-accent:#225f58;--source-tint:#edf7f1;--source-ink:#20322f;min-width:0;color:var(--source-ink)}
+.learning-source[data-subject="pea103"]{--source-accent:#5a49a4;--source-tint:#f2effb;--source-ink:#28223d}
+.source-banner{display:flex;justify-content:space-between;gap:22px;align-items:center;padding:26px 28px;border:1px solid color-mix(in srgb,var(--source-accent) 20%,white);border-radius:20px;background:var(--source-tint);margin:0 0 15px}
+.source-eyebrow{display:block;font-size:10px;font-weight:800;letter-spacing:.14em;line-height:1.7;color:var(--source-accent,#225f58)}
+.source-banner h2{font-size:clamp(21px,2.6vw,30px);letter-spacing:-.04em;line-height:1.2;margin:8px 0 10px}
+.source-banner p,.source-fidelity{font-size:12px;line-height:1.7;margin:0;color:#59686b}
+.source-fidelity{margin:0 0 23px;padding:0 4px}
+.source-download,.companion-source-link{display:inline-flex;justify-content:center;align-items:center;text-decoration:none;font-size:12px;font-weight:750;border:1px solid color-mix(in srgb,var(--source-accent,#225f58) 30%,white);padding:11px 15px;border-radius:10px;background:white;color:var(--source-accent,#225f58);flex-shrink:0;transition:transform .18s,box-shadow .18s}
+.source-download:hover,.companion-source-link:hover{transform:translateY(-2px);box-shadow:0 5px 15px #1c34341a}
+.source-section{border:1px solid #e1e9e5;border-left:3px solid var(--source-accent);border-radius:4px 16px 16px 4px;background:#fff;margin:0 0 22px;overflow:hidden;scroll-margin-top:100px}
+.source-section-body{padding:24px 28px}
+.source-paragraph{font-family:"Source Symbols",var(--body),sans-serif;white-space:pre-wrap;overflow-wrap:anywhere;font-size:15px;line-height:1.85;max-width:100%;tab-size:4}
+.source-subheading{font-weight:750;font-size:17px;color:var(--source-accent);padding-top:3px}
+.source-example,.source-takeaway{background:var(--source-tint);padding:16px 20px;border-radius:12px;margin:8px 0 14px}
+.source-page-marker{font-size:10px;letter-spacing:.04em;color:#75877f;padding:8px 0;border-top:1px dashed #dce5e0;margin-top:8px}
+.source-table{font-family:"Source Symbols","Cascadia Code",Consolas,monospace;font-size:12px;white-space:pre;overflow-x:auto;overflow-wrap:normal;padding-bottom:6px}
+.source-supplement>summary{padding:20px 25px;font-size:15px;font-weight:750;color:var(--source-accent);cursor:pointer;background:var(--source-tint)}
+.source-slide{margin:0 0 24px;border:1px solid #e6e2ef;border-radius:16px;overflow:hidden;background:#fff;scroll-margin-top:95px;box-shadow:0 4px 20px #2a234608}
+.source-slide-top{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px 18px;background:var(--source-tint)}
+.source-slide-top>span{font-size:10px;font-weight:800;letter-spacing:.11em;color:var(--source-accent)}
+.source-slide-top a{font-size:11px;font-weight:650;color:var(--source-accent);text-decoration:none}
+.source-slide-image{display:block;background:#fafaf8}
+.source-slide-image img{display:block;width:100%;height:auto}
+.source-transcript{border-top:1px solid #ece9f1}
+.source-transcript summary{padding:12px 18px;font-size:12px;color:var(--source-accent);font-weight:650;cursor:pointer}
+.source-page-text{padding:12px 22px 22px;overflow-x:auto}
+.source-large .source-paragraph{font-size:18px;line-height:1.95}
+.source-large .source-table{font-size:14px}
+.source-spotlight .source-body{background:#f0f3ef;padding:18px;border-radius:18px}
+.source-spotlight .source-section,.source-spotlight .source-slide{box-shadow:0 8px 26px #21312e0d}
+.learning-companion{--source-accent:#225f58;padding:23px;border:1px solid #dae8e2;border-radius:18px;background:linear-gradient(145deg,#f2f8f3,#fff);margin:24px 0;min-width:0}
+.companion-heading h3{font-size:23px;letter-spacing:-.04em;margin:6px 0 8px;color:#213d35}
+.companion-heading p{font-size:12px;line-height:1.7;color:#60726b;max-width:540px}
+.source-search-form{margin:20px 0 12px}
+.source-search-form label{display:block;font-size:12px;font-weight:700;color:#34564b;margin-bottom:7px}
+.source-search-row{display:flex;gap:8px;max-width:500px}
+.source-search-row input{width:100%;min-width:0;border:1px solid #cfded7;border-radius:9px;padding:10px 12px;background:white;color:#203b30;font:inherit;font-size:13px}
+.source-control{font:inherit;font-size:12px;font-weight:700;cursor:pointer;background:#fff;border:1px solid #ccddd4;border-radius:9px;color:#285645;padding:10px 13px;transition:background .18s,transform .18s}
+.source-control:hover{background:#e9f4ed;transform:translateY(-1px)}
+.source-control[aria-pressed="true"]{background:#245d4d;border-color:#245d4d;color:white}
+.source-search-result{display:block;min-height:20px;font-size:12px;line-height:1.6;margin-top:8px;color:#426956}
+.source-reading-controls{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}
+.source-jumps{display:flex;gap:7px;flex-wrap:wrap;margin:14px 0 20px}
+.source-jumps a{font-size:11px;line-height:1.5;color:#406151;padding:6px 9px;border-radius:7px;background:#edf4ef;text-decoration:none;border:1px solid #dfebe3}
+.source-jumps a:hover{background:#dfeee4}
+.source-body mark{background:#ffdf7c;color:#3c2a00;border-radius:3px;box-shadow:0 0 0 2px #ffdf7c}
+.source-control:focus-visible,.source-search-row input:focus-visible,.source-jumps a:focus-visible,.source-slide a:focus-visible,.source-download:focus-visible,.companion-source-link:focus-visible{outline:3px solid #7e9bdf;outline-offset:3px}
+@media(max-width:700px){.source-banner{padding:20px;align-items:flex-start;flex-direction:column;gap:13px}.source-section-body{padding:18px}.source-paragraph{font-size:14px;line-height:1.8}.source-table{font-size:11px}.source-example,.source-takeaway{padding:12px}.learning-companion{padding:18px}.source-slide-top{padding:11px 13px}.source-page-text{padding:10px 15px}.source-spotlight .source-body{padding:8px}.source-jumps{max-height:170px;overflow-y:auto}.source-slide-image{overflow:auto}.source-slide-image img{min-width:100%}}
+@media(prefers-reduced-motion:reduce){.source-control,.source-download,.companion-source-link{transition:none}.source-control:hover,.source-download:hover,.companion-source-link:hover{transform:none}}
