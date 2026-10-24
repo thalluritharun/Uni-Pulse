@@ -1,93 +1,156 @@
-﻿# Uni Pulse
+﻿# Uni Pulse 🎓
 
-A small HTML, CSS, and JavaScript student and faculty workspace. It runs without a build step or external services. Indigo and mint colours, bundled DM Sans and Plus Jakarta Sans fonts, dark mode, responsive layouts, and reduced-motion support are included.
+**A student and faculty workspace that brings learning, planning, focus, and academic progress together.**
 
-## Run locally
+Uni Pulse is a responsive web application designed to help students organise their academic lives and give faculty a workspace for preparing learning resources, assignments, tests, and announcements.
 
-Keep the project files together. From the `campus-compass` folder, run:
+The project is built with **HTML, CSS, and vanilla JavaScript**. It runs entirely in the browser, without a build step or backend server. Its current version demonstrates academic workflows using local browser storage.
 
-```sh
-python -m http.server 8000 --bind 127.0.0.1
-```
+## Project Goal
 
-Open `http://127.0.0.1:8000`, then choose **Explore student demo** or switch to **Faculty** and explore its demo. You can also create separate local practice profiles. Stop the server with Ctrl+C.
+Students often manage learning materials, deadlines, study sessions, and results across several disconnected tools. Uni Pulse brings these activities into one interface.
 
-The site can be opened from `index.html`, but localhost is recommended for consistent storage and password hashing. No internet connection, API key, package installation, or Node.js is needed to use it. Use the same address and port each time: each origin has separate browser storage.
+For students, the goal is to make it easier to:
 
-## Learning and focus
+- Find and read subject materials.
+- Track learning progress and practise with quizzes.
+- Plan assignments, tests, and personal study activities.
+- Build consistent study habits with a focus timer.
+- Record marks and understand academic performance.
 
-- **PEA 101:** the full available Unit 1 source text is arranged across its existing six lessons, including its original examples, questions, and activities. The old shortened lesson copy is no longer shown. The original PEA 101 PDF is unavailable in this project; the preserved extracted text is the source of truth here.
-- **PEA 103 - AI Interaction Design:** all 50 pages of the supplied PDF are organised into eight reading topics. Original page images preserve diagrams and layout; expandable transcripts provide the extracted text. Download the original PDF or enlarge individual pages.
-- **Reading companion:** search and highlight words in the current lesson, jump to sections, enlarge text, use a reading spotlight, and download the source. This replaces the lesson's **Add your notes** area. Existing saved notes and bookmarks remain available in Saved lessons.
-- **Progress and quizzes:** PEA 101 retains its 30-question Unit 1 bank, five-question attempts, five-minute timer, 80% pass requirement, and answer review. Quiz answers and absolute deadlines survive refresh. PEA 103 is a reading collection: completing its eight topics reaches 100% without an invented quiz.
-- **Focus studio:** choose 25-minute focus, five-minute short break, or 15-minute long break; set a custom duration of 1-120 minutes and a task intention. Start, pause, resume, reset, and optionally play a completion sound. The timer, task, preferences, and latest 100 completed sessions belong to the local profile. Today/week totals and recent history are shown. Refresh or sign-out does not reset a saved deadline; completion is reconciled when the profile is reopened. Sound requires an open tab, and focus sessions do not award lesson completion.
+For faculty, the goal is to provide a workspace to:
 
-PEA 101 Units 2-5 retain their syllabus outlines; their full learning material and question banks are still pending. PEA 102, 104, 105, and 106 also await supplied content. The grand test remains unavailable until every required unit has material and has been passed. The six catalogue subjects currently belong to Semester 1; change their `semester` fields in `js/data.js` when the actual course allocation is available.
+- Prepare and organise academic resources.
+- Create assignments, tests, and announcements.
+- Publish materials for eligible local student profiles.
+- Review learning progress and recorded academic results.
 
-## Schedule, reports, and notifications
+## Features
 
-The calendar includes clearly labelled sample guest lectures, assignment deadlines, and this requested CLA 2 sequence:
+### Student Learning Workspace
 
-| Date in 2026 | Papers |
+- A subject catalogue with semester-based organisation.
+- Lesson reading with progress tracking.
+- Search and highlighting within the current lesson.
+- Adjustable text size, a reading spotlight, and section navigation.
+- Access to saved notes and bookmarks.
+- Downloads for available source materials.
+
+The current content includes PEA 101 Unit 1 lessons and quizzes, along with a PEA 103 AI Interaction Design reading collection. Other subjects and units include outlines or await additional learning material.
+
+### Quizzes and Progress
+
+- Five-question practice attempts for the available PEA 101 Unit 1 question bank.
+- A five-minute timer and an 80% passing requirement.
+- Answer review after an attempt.
+- Saved answers and deadlines that survive a page refresh.
+- Reading completion tracking for PEA 103.
+
+Quiz availability follows the supplied content. Subjects without question banks do not display invented assessments.
+
+### Focus Studio
+
+- Preset focus, short-break, and long-break timers.
+- Custom sessions from 1 to 120 minutes.
+- A task intention for each session.
+- Start, pause, resume, and reset controls.
+- Optional completion sound.
+- Recent session history and daily/weekly study totals.
+- Timer recovery after refresh or signing back in.
+
+### Calendar and Planning
+
+- Personal events for study activities and deadlines.
+- Event editing, completion, and deletion.
+- Faculty-published assignment and test dates.
+- Clearly labelled sample campus activities.
+- Calendar export with reminder information.
+
+### Academic Reports
+
+- Separate views for sample marks and personal records.
+- Assignment and test score recording.
+- Semester results with grade points and credits.
+- Credit-weighted GPA calculation.
+- CSV export and printable reports.
+
+GPA is calculated using:
+
+**GPA = Σ(grade point × course credits) ÷ Σ(course credits)**
+
+Assignment and quiz scores are tracked separately from semester GPA.
+
+### Faculty Workspace
+
+- Create notes, slides, learning content, assignments, tests, and notices.
+- Save private drafts before publishing.
+- Edit or delete existing posts.
+- Add subject details, full text, optional due dates, and attachments.
+- Attach PDF, PPT, PPTX, TXT, DOC, and DOCX files up to 20 MB.
+- Make published resources available to eligible local student profiles.
+- Review local learning progress, quiz averages, and recorded results.
+- Explore reports using clearly labelled fictional student examples.
+
+### Notifications
+
+- An in-app feed for campus updates and faculty notices.
+- Read and unread controls.
+- Sample notifications for demonstrating the interface.
+
+### Interface and Accessibility
+
+- Responsive layouts for desktop and mobile screens.
+- Light and dark themes.
+- Indigo and mint visual styling.
+- Bundled DM Sans and Plus Jakarta Sans fonts.
+- Reduced-motion support.
+- Reading controls that help users adjust the learning experience.
+
+## Technologies Used
+
+| Technology | Purpose |
 | --- | --- |
-| Thursday, 29 October | 2 subjects |
-| Saturday, 31 October | 1 subject |
-| Tuesday, 3 November | 2 subjects |
-| Wednesday, 4 November | 1 subject |
+| HTML5 | Page structure and application content |
+| CSS3 | Responsive layouts, themes, typography, and visual styling |
+| Vanilla JavaScript | Navigation, user interactions, quizzes, timers, reports, and application logic |
+| localStorage | Local profiles, preferences, progress, and academic records |
+| sessionStorage | The active browser session |
+| IndexedDB | Storage for uploaded attachment files |
+| Web Crypto API | Salted PBKDF2 password verifiers for local practice profiles |
+| Git and GitHub | Version control and project hosting |
 
-Subject order, start times, guest sessions, and assignment details are placeholders. Students can add, edit, complete, and delete their own events. Faculty-published assignment/test dates also appear in their schedule. Calendar export includes one-hour event durations and 30-minute reminders for calendar apps that support them.
+The application does not require a frontend framework, package installation, or compilation.
 
-Report cards offer **Explore sample marks** and **My records**. For a Semester 2 profile, sample CLA and assignment marks appear in Semester 2, and previous final results with GPA appear in Semester 1. Samples never become personal results, actual student profiles, or personal calendar entries. They reuse catalogue subject names for demonstration, rather than defining an official semester curriculum.
+## How It Was Implemented
 
-Personal report entries support assignment/test scores and end-semester grade points with credits. GPA is credit-weighted: `sum(points x credits) / sum(credits)`. Assignment and quiz marks do not affect GPA. Values remain partial until all applicable final results are entered. CSV export and print layouts are included; these records are not official transcripts.
+Uni Pulse uses a browser-based frontend organised into separate files for application behaviour, academic data, learning content, and focus tools.
 
-The notification feed combines sample campus updates and faculty-published notices, with read/unread controls. Notifications are shown inside the open website; there are no push or email notifications while it is closed.
+- **Navigation and account logic** manage the student and faculty experiences.
+- **Subject data and learning content** provide the catalogue, lesson material, and available question banks.
+- **Browser storage** preserves local profiles, progress, preferences, and records between visits.
+- **IndexedDB** stores attachment bytes for locally published faculty resources.
+- **Deadline-based timers** allow quiz and focus sessions to recover their remaining time after a refresh.
+- **Role and semester checks** control which resources appear in the local interface.
+- **Export and print features** let users take academic records and calendar information outside the application.
 
-## Faculty workspace
+The project keeps its main functionality available without external services.
 
-Faculty can create notes, slides, learning content, assignments, tests, and notifications. Posts support a subject, full text, optional due date, and attachment. Save a private draft, publish it, edit it, or delete it. Published resources appear in eligible local students' learning libraries; students can read full content and download the original attachment. Drafts remain hidden from students.
+## Project Structure
 
-Attachments accept PDF, PPT, PPTX, TXT, DOC, and DOCX files up to 20 MB. File bytes are stored in IndexedDB, while publication metadata is saved with the local database. A student in an earlier semester cannot access a later-semester subject's post. These browser checks are demonstration behaviour, not server-enforced access control.
-
-Faculty can inspect local student learning progress, quiz averages, and recorded results. Three explicitly fictional sample students also provide populated reports with current marks and previous final results. Their GPA is calculated from the displayed records; sample students are not written into the actual profile database.
-
-**Sharing is limited to profiles using the same browser and origin. No backend is connected.** Publishing does not send content to other devices, browsers, or real campus accounts.
-
-## Storage and account scope
-
-Local profiles use salted PBKDF2 password verifiers. Use a practice password: people with access to browser storage can inspect or modify local profiles, roles, and data. There is no institutional authentication, password recovery, cross-device sync, shared server, or secure exam scoring. Quiz answers are delivered to the browser.
-
-Profiles and metadata use localStorage; the selected session uses sessionStorage; uploaded files use IndexedDB. Clearing site data removes them. The legacy storage key is retained so existing profiles survive the Uni Pulse rebrand at the same address. Profile JSON exports exclude password verifiers and do not include shared publications or attachment bytes. Keep separate original copies of faculty files; there is no backup-import interface.
-
-## File guide
-
-| File or folder | Purpose |
-| --- | --- |
-| `index.html` | Application entry and local script/style loading |
-| `js/app.js`, `js/core.js` | Navigation, accounts, local records, progress, quiz and GPA rules |
-| `js/data.js` | Subject catalogue, outlines, and original question bank |
-| `js/learning-sources.js`, `js/learning-content.js` | Preserved source records, reading layout, and companion controls |
-| `js/focus.js` | Persistent timer, break modes, history, and completion sound |
-| `js/faculty.js` | Publications, IndexedDB attachments, resource access, and student reports |
-| `js/campus.js` | Separate sample schedule, report rows, and notifications |
-| `css/` | Base styles and separate fonts, focus, faculty, learning, and campus styles |
-| `assets/` | Pulse brand mark and locally bundled font files/licences |
-| `resources/PSCT-Unit-1-source-text.txt` | Available full PEA 101 Unit 1 extracted text |
-| `resources/PEA103-AI-Interaction-Design.pdf` | Original 50-page PEA 103 PDF |
-| `resources/PEA103-AI-Interaction-Design-source-text.txt`, `resources/pea103-pages/` | Extracted PEA 103 text and original page renders |
-| `resources/build-learning-content.py` | Regenerates structured source records from the local sources |
-| `tests/`, `docs/VERIFICATION.md` | Automated checks and current verification record |
-
-## Run checks
-
-With Node.js available, run from the project folder:
-
-```sh
-node tests/core.test.cjs
-node tests/focus.test.cjs
-node tests/learning.test.cjs
-```
-
-The application itself does not require Node.js. The 34 core checks, six focus checks, source-fidelity suite, 27 Chrome integration checks, and 13 additional mobile learning checks pass. See `docs/VERIFICATION.md` for coverage and practical limits.
-
-To move beyond this local edition, connect authenticated student/faculty roles, shared database records and file storage, and server-enforced ownership and enrolment rules. Confirm real course allocations, timetable details, and grading policies before using institutional data.
+```text
+Uni Pulse/
+├── index.html
+├── css/
+├── js/
+│   ├── app.js
+│   ├── core.js
+│   ├── data.js
+│   ├── learning-sources.js
+│   ├── learning-content.js
+│   └── focus.js
+├── assets/
+├── resources/
+├── docs/
+├── tests/
+├── .gitignore
+└── README.md
