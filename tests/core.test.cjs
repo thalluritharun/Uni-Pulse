@@ -53,17 +53,18 @@ ok('streak and week calculations handle dates across a month boundary',()=>{
 
 // Lightweight rendering/event harness. This does not emulate a browser layout engine.
 // Forms with an input named "id" expose that input as form.id, not their ID string.
-function appHarness(profiles,sessionId,initial='#home',rawOverride){
+function appHarness(profiles,sessionId,initial='#home',rawOverride,approval=null){
  const handlers={},winHandlers={},nodes={};
  function node(sel){if(sel==='.lesson-copy')return nodes['#app']?.innerHTML.includes('class="lesson-copy"')?{}:null;if(!nodes[sel])nodes[sel]={innerHTML:'',textContent:'',value:'',style:{setProperty(name,value){this[name]=value;}},dataset:{},open:false,disabled:false,checked:false,isConnected:true,classList:{add(){},remove(){},toggle(){}},addEventListener(){},showModal(){this.open=true;},close(){this.open=false;},focus(){},setAttribute(){},appendChild(){},append(){},remove(){},click(){},matches(){return false;},querySelector(){return node('#form-button');},querySelectorAll(){return [];}};return nodes[sel];}
  const document={querySelector:node,querySelectorAll(){return [];},getElementById:id=>node('#'+id),createElement:tag=>node('created-'+tag),body:{classList:{toggle(){},remove(){}},appendChild(){}},documentElement:{dataset:{},style:{}},activeElement:{tagName:'BODY'},addEventListener(name,fn){(handlers[name] ||= []).push(fn);},title:''};
  let stored=rawOverride===undefined?JSON.stringify({version:1,users:profiles}):rawOverride,session=sessionId;
- const loc={_hash:initial,get hash(){return this._hash;},set hash(v){this._hash=v.startsWith('#')?v:'#'+v;}};
+ const loc={protocol:'http:',_hash:initial,get hash(){return this._hash;},set hash(v){this._hash=v.startsWith('#')?v:'#'+v;}};
  const ctx=vm.createContext({document,location:loc,crypto:webcrypto,console,TextEncoder,Blob,URL,Date,setTimeout(){return 1;},clearTimeout(){},setInterval(){return 1;},clearInterval(){},localStorage:{getItem(){return stored;},setItem(k,v){stored=v;}},sessionStorage:{getItem(){return session;},setItem(k,v){session=v;},removeItem(){session=null;}},FormData:class{constructor(form){this.data=form.data;}get(k){return this.data[k]??null;}}});
+ ctx.fetch=async(url,options={})=>{const input=options.body?JSON.parse(options.body):{};const allowed=approval&&(url.endsWith('/session')||url.endsWith('/login')&&input.email===approval.identity&&input.password==='approved-only-123');return {ok:!!allowed,status:allowed?200:401,json:async()=>allowed?{faculty:{id:approval.id,email:approval.identity,name:approval.name,role:'faculty'}}:{error:'Email or password is incorrect, or this account is not approved.'}};};
  ctx.window=ctx;ctx.addEventListener=(name,fn)=>(winHandlers[name] ||= []).push(fn);ctx.scrollTo=()=>{};ctx.matchMedia=()=>({matches:false});
- for(const script of ['data.js','core.js','campus.js','focus.js','faculty.js','learning-sources.js','learning-content.js','app.js'])vm.runInContext(source(script),ctx,{filename:script});
+ for(const script of ['data.js','core.js','timetable.js','handbooks.js','campus.js','focus.js','faculty.js','learning-sources.js','learning-content.js','app.js'])vm.runInContext(source(script),ctx,{filename:script});
  const dispatch=(group,name,event)=>Promise.all((group[name] || []).map(fn=>fn(event)));
- return {ctx,nodes,html:()=>node('#app').innerHTML,data:()=>JSON.parse(stored),route(hash){loc.hash=hash;return dispatch(winHandlers,'hashchange',{});},click(action,data={}){const button={dataset:{action,...data},disabled:false};return dispatch(handlers,'click',{preventDefault(){},target:{closest(sel){if(sel==='[data-action]')return button;const prefix=sel.match(/^\[data-action\^="([^"]+)"\]$/)?.[1];return prefix&&action.startsWith(prefix)?button:null;}}});},submit(id,data,submitterValue){return dispatch(handlers,'submit',{preventDefault(){},submitter:{value:submitterValue},target:{id:Object.hasOwn(data,'id')?{name:'id',value:data.id}:id,data,isConnected:true,getAttribute(name){return name==='id'?id:null;},matches(){return false;},querySelector(){return node('#submit');},querySelectorAll(){return [];}}});},change(target){return dispatch(handlers,'change',{target:{dataset:{},...target}});},input(target){return dispatch(handlers,'input',{target:{dataset:{},...target}});}};
+ return {ctx,nodes,ready:new Promise(setImmediate),html:()=>node('#app').innerHTML,data:()=>JSON.parse(stored),route(hash){loc.hash=hash;return dispatch(winHandlers,'hashchange',{});},click(action,data={}){const button={dataset:{action,...data},disabled:false};return dispatch(handlers,'click',{preventDefault(){},target:{closest(sel){if(sel==='[data-action]')return button;const prefix=sel.match(/^\[data-action\^="([^"]+)"\]$/)?.[1];return prefix&&action.startsWith(prefix)?button:null;}}});},submit(id,data,submitterValue){return dispatch(handlers,'submit',{preventDefault(){},submitter:{value:submitterValue},target:{id:Object.hasOwn(data,'id')?{name:'id',value:data.id}:id,data,isConnected:true,getAttribute(name){return name==='id'?id:null;},matches(){return false;},querySelector(){return node('#submit');},querySelectorAll(){return [];}}});},change(target){return dispatch(handlers,'change',{target:{dataset:{},...target}});},input(target){return dispatch(handlers,'input',{target:{dataset:{},...target}});}};
 }
 const testProfile=C.newProfile('A <Student>','a-test');
 const app=appHarness([testProfile],testProfile.id);
@@ -86,7 +87,7 @@ ok('corrupted browser storage presents a warning instead of crashing',()=>{const
  await app.click('submit-quiz');await app.click('confirm');app.route(app.ctx.location.hash);
  ok('passing submission records a review and unlocks unit 2',()=>{const p=app.data().users[0];assert.equal(p.activeQuiz,null);assert.equal(p.attempts[0].percent,80);assert.equal(p.progress['pea101/u1'].passed,true);assert.ok(app.html().includes('Your answers, explained'));app.route('#subject/pea101/u2');assert.ok(app.html().includes('Unit unlocked'));});
  await app.submit('event-form',{title:'Test deadline',date:'2026-12-01T14:00',type:'Assignment',subject:'PEA 101',details:'Bring a report',id:''});app.route('#schedule');
- ok('schedule events persist separately from other student profiles',()=>{assert.equal(app.data().users[0].events.length,1);assert.equal(app.data().users[0].events[0].title,'Test deadline');const other=appHarness([C.newProfile('Second','second')],null);assert.ok(other.html().includes('Welcome back to Uni Pulse.'));assert.ok(!other.html().includes('WELCOME TO UNI PULSE'));assert.equal(other.data().users[0].events.length,0);});
+ ok('schedule events persist separately from other student profiles',()=>{assert.equal(app.data().users[0].events.length,1);assert.equal(app.data().users[0].events[0].title,'Test deadline');const other=appHarness([C.newProfile('Second','second')],null);assert.ok(other.html().includes('Welcome to Uni Pulse.'));assert.ok(!other.html().includes('WELCOME TO UNI PULSE'));assert.equal(other.data().users[0].events.length,0);});
  await app.submit('result-form',{id:'',type:'endsem',semester:'1',subject:'PEA 101',title:'End semester',date:'2026-12-01',points:'8',credits:'4'});
  await app.submit('result-form',{id:'',type:'endsem',semester:'1',subject:'PEA 102',title:'End semester',date:'2026-12-01',points:'6',credits:'2'});app.route('#report');
  ok('report form and rendering calculate credit-weighted GPA',()=>{assert.equal(app.data().users[0].results.length,2);assert.ok(app.html().includes('7.33'));});
@@ -97,7 +98,7 @@ ok('corrupted browser storage presents a warning instead of crashing',()=>{const
  ok('notes persist and are escaped on saved-items page',()=>{assert.ok(app.html().includes('&lt;script&gt;'));assert.ok(!app.html().includes('<script>not HTML'));assert.equal(app.data().users[0].bookmarks.length,1);});
  const exp=clone(during);exp.activeQuiz.deadline=Date.now()-1;const expired=appHarness([exp],exp.id,'#quiz');
  ok('expired saved attempts are scored automatically on reopen',()=>{assert.equal(expired.data().users[0].activeQuiz,null);assert.equal(expired.data().users[0].attempts[0].expired,true);});
- const faculty=C.newProfile('Faculty','faculty','faculty');const facultyApp=appHarness([faculty],faculty.id);facultyApp.route('#learning');
+ const faculty=C.newProfile('Faculty','approved@institution.example','faculty');faculty.approvedFacultyId=faculty.id;faculty.identity='approved-faculty:'+faculty.id;const approvedIdentity={...faculty,identity:'approved@institution.example'};const facultyApp=appHarness([faculty],faculty.id,'#home',undefined,approvedIdentity);await facultyApp.ready;facultyApp.route('#learning');
  ok('faculty access stays in its dedicated publishing workspace',()=>{assert.equal(facultyApp.ctx.location.hash,'#home');assert.ok(facultyApp.html().includes('YOUR TEACHING STUDIO'));facultyApp.route('#faculty-materials');assert.ok(facultyApp.html().includes('Your teaching library.'));facultyApp.route('#faculty-students');assert.ok(facultyApp.html().includes('Sample student'));assert.equal(facultyApp.data().users.length,1);});
  facultyApp.route('#faculty-students/sample-arya');
  ok('sample faculty reports include current marks and previous semester final results',()=>{assert.ok(facultyApp.html().includes('CLA 1'));assert.ok(facultyApp.html().includes('Assignment 1'));assert.ok(facultyApp.html().includes('Previous semester final'));assert.ok(facultyApp.html().includes('Sample report'));assert.equal(facultyApp.data().users.length,1);assert.equal(facultyApp.data().users[0].results.length,0);});
@@ -122,11 +123,47 @@ ok('corrupted browser storage presents a warning instead of crashing',()=>{const
  const ai=readingApp.ctx.CAMPUS_DATA.subjects.find(s=>s.id==='pea103'),aiUnit=ai.units[0];
  for(const topic of aiUnit.topics){readingApp.route(`#subject/${ai.id}/${aiUnit.id}/${topic.id}`);await readingApp.click('complete-topic',{key:`${ai.id}/${aiUnit.id}/${topic.id}`});}
  ok('reading-only collections reach 100 percent without requiring an invented quiz',()=>{const profile=readingApp.data().users[0],state=profile.progress[`${ai.id}/${aiUnit.id}`];assert.equal(aiUnit.readingOnly,true);assert.equal(state.done.length,aiUnit.topics.length);assert.equal(state.passed,true);assert.equal(C.unitProgress(profile,ai,aiUnit),100);assert.equal(profile.attempts.length,0);assert.equal(profile.activeQuiz,null);});
- const auth=appHarness([],null);await auth.click('auth-switch');await auth.submit('auth-form',{name:'Local User',identity:'local-user',password:'practice-only-123',semester:'1'});
- ok('local sign-up stores a salted verifier, never a plain password',()=>{const p=auth.data().users[0];assert.ok(p.auth.salt.length>=32);assert.equal(p.auth.hash.length,64);assert.ok(!JSON.stringify(auth.data()).includes('practice-only-123'));});
- await auth.click('logout');await auth.click('auth-switch');await auth.submit('auth-form',{identity:'local-user',password:'wrong-password'});
- ok('incorrect local password is rejected',()=>{assert.ok(auth.nodes['#auth-error'].textContent.includes('does not match'));});
- await auth.submit('auth-form',{identity:'local-user',password:'practice-only-123'});
- ok('correct local password resumes the matching profile',()=>{assert.ok(auth.html().includes('Your workspace'));});
+ const auth=appHarness([],null);
+ ok('entry choices contain no student form or registration',()=>{assert.ok(auth.html().includes('Enter as a student'));assert.ok(auth.html().includes('Enter as a faculty'));assert.ok(!auth.html().includes('<form'));assert.ok(!auth.html().includes('data-action="demo"'));assert.ok(!auth.html().includes('auth-switch'));});
+ await auth.click('enter-student');
+ ok('student enters without details and receives a browser workspace',()=>{assert.equal(auth.data().users.length,1);assert.equal(auth.data().users[0].role,'student');assert.equal(auth.data().users[0].identity,'browser-student');assert.ok(auth.html().includes('Your workspace'));assert.equal(auth.data().users[0].auth,undefined);});
+ const studentId=auth.data().users[0].id;await auth.click('logout');await auth.click('enter-student');
+ ok('student re-entry resumes the same saved profile',()=>{assert.equal(auth.data().users.length,1);assert.equal(auth.data().users[0].id,studentId);});
+ auth.route('#schedule');
+ ok('schedule shows the weekly screenshot timetable and this week classes',()=>{assert.ok(auth.html().includes('Weekly class timetable'));assert.ok(auth.html().includes('NAB 204'));assert.ok(auth.html().includes('16:00\u201317:30'));assert.ok(auth.html().includes('Saturday'));assert.equal(auth.data().users[0].events.length,0);});
+ await auth.click('logout');await auth.click('enter-faculty');await auth.submit('faculty-auth-form',{email:'unknown@institution.example',password:'incorrect'});
+ ok('unapproved faculty is rejected without creating a faculty profile',()=>{assert.ok(auth.nodes['#auth-error'].textContent.includes('not approved'));assert.equal(auth.data().users.filter(p=>p.role==='faculty').length,0);});
+ await auth.click('demo');await auth.submit('auth-form',{name:'Fake',identity:'fake',password:'fake-password'});
+ ok('old demo and registration actions cannot bypass faculty approval',()=>{assert.ok(auth.html().includes('Faculty authorization'));assert.equal(auth.data().users.length,1);});
+ const legacy=C.newProfile('Legacy Faculty','legacy','faculty');legacy.demo=true;
+ const legacyApp=appHarness([legacy],legacy.id);await legacyApp.ready;
+ ok('a legacy local faculty session is not institutional approval',()=>{assert.ok(legacyApp.html().includes('Choose your workspace'));assert.ok(!legacyApp.html().includes('YOUR TEACHING STUDIO'));});
+ const approvedLogin=appHarness([],null,'#home',undefined,approvedIdentity);await approvedLogin.click('enter-faculty');await approvedLogin.submit('faculty-auth-form',{email:approvedIdentity.identity,password:'approved-only-123'});
+ ok('approved backend identity opens the faculty workspace',()=>{assert.ok(approvedLogin.html().includes('YOUR TEACHING STUDIO'));assert.equal(approvedLogin.data().users[0].approvedFacultyId,faculty.id);assert.equal(approvedLogin.data().users[0].auth,undefined);});
+ const chapterProfile=C.newProfile('Chapter reader','chapter-reader');
+ const chapterApp=appHarness([chapterProfile],chapterProfile.id);
+ chapterApp.route('#subject/pea101/u1/framing');
+ await chapterApp.click('start-chapter-quiz',{subject:'pea101',unit:'u1',topic:'framing'});
+ ok('chapter quiz cannot start before its chapter is marked read',()=>{assert.equal(chapterApp.data().users[0].activeQuiz,null);});
+ await chapterApp.click('chapter-read',{key:'pea101/u1/framing'});
+ await chapterApp.click('start-chapter-quiz',{subject:'pea101',unit:'u1',topic:'framing'});
+ ok('chapter entry starts a focused saved attempt',()=>{const a=chapterApp.data().users[0].activeQuiz;assert.equal(a.topicId,'framing');assert.ok(a.questions.every(q=>q.topic==='framing'));assert.ok(chapterApp.html().includes('Chapter quiz'));});
+ const chapterReload=appHarness(chapterApp.data().users,chapterProfile.id,'#quiz');
+ ok('chapter attempt survives reload with its scope and original deadline',()=>{assert.equal(chapterReload.data().users[0].activeQuiz.topicId,'framing');assert.equal(chapterReload.data().users[0].activeQuiz.deadline,chapterApp.data().users[0].activeQuiz.deadline);});
+ for(let i=0;i<chapterApp.data().users[0].activeQuiz.questions.length;i++){const q=chapterApp.data().users[0].activeQuiz.questions[i];await chapterApp.click('quiz-jump',{index:String(i)});await chapterApp.change({name:'quiz-answer',value:String(q.answer)});}
+ await chapterApp.click('submit-quiz');await chapterApp.click('confirm');chapterApp.route(chapterApp.ctx.location.hash);
+ ok('passing a chapter quiz never passes its unit or unlocks the next unit',()=>{const p=chapterApp.data().users[0];assert.equal(p.attempts[0].percent,100);assert.equal(C.stateFor(p,s,u).passed,false);assert.equal(C.unlocked(p,s,1),false);assert.ok(chapterApp.html().includes('Back to chapter'));assert.ok(!chapterApp.html().includes('Open next unit'));});
+ chapterApp.route('#subject/pea101/u1/quiz');
+ ok('chapter scores do not become unit quiz best scores',()=>{assert.ok(!chapterApp.html().includes('Best score:'));});
+ chapterApp.route('#report');await chapterApp.click('report-tab',{value:'quizzes'});
+ ok('report labels chapter attempts separately',()=>{assert.ok(chapterApp.html().includes('Chapter quiz'));assert.ok(chapterApp.html().includes('Problem Identification and Framing'));});
+ const realDB=JSON.stringify(chapterApp.data());await chapterApp.click('logout');await chapterApp.click('enter-faculty');await chapterApp.click('enter-faculty-demo');
+ ok('faculty demo starts without approval and exposes sample teaching tools',()=>{assert.ok(chapterApp.html().includes('Faculty demo'));assert.ok(chapterApp.html().includes('YOUR TEACHING STUDIO'));assert.equal(JSON.stringify(chapterApp.data()),realDB);});
+ await chapterApp.submit('faculty-post-form',{id:'',type:'notes',subjectId:'pea101',title:'Demo-only post',body:'Disposable practice notes.',dueAt:''},'published');chapterApp.route('#faculty-materials');
+ ok('faculty demo publishing never changes real saved records',()=>{assert.ok(chapterApp.html().includes('Demo-only post'));assert.equal(JSON.stringify(chapterApp.data()),realDB);});
+ await chapterApp.click('logout');await chapterApp.click('enter-faculty');await chapterApp.click('enter-faculty-demo');chapterApp.route('#faculty-materials');
+ ok('exiting and re-entering resets demo posts',()=>{assert.ok(!chapterApp.html().includes('Demo-only post'));assert.equal(JSON.stringify(chapterApp.data()),realDB);});
+ const handbookApp=appHarness([testProfile],testProfile.id);
+ ok('all six subjects link to their supplied original handbook without claiming a local download',()=>{assert.equal(handbookApp.ctx.UniPulseHandbooks.entries.length,6);for(const file of handbookApp.ctx.UniPulseHandbooks.entries){handbookApp.route('#subject/'+file.subjectId);assert.ok(handbookApp.html().includes(file.viewUrl));assert.ok(handbookApp.html().includes('Downloads are currently restricted'));}});
  console.log(`\n${checks} checks passed. Browser layout testing remains a separate manual step.`);
 })().catch(err=>{console.error(err);throw err;});

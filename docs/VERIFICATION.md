@@ -1,5 +1,57 @@
 ﻿# Uni Pulse verification
 
+## Faculty demo and chapter practice — 7 November 2026
+
+The core/integration suite passes **49 checks**, including isolated demo publishing and reset, chapter quiz readiness and persistence, chapter scoring without unit unlock, distinct review/report labels, and six correctly mapped handbook reader links. `node tests/chapter.test.cjs` passes **nine chapter assessment checks**. Existing focus, learning-source, and timetable suites also pass.
+
+Chrome desktop/mobile verification confirms faculty demo entry without credentials or API requests, sample posts/reports, attachment upload and byte-identical download, no demo IndexedDB writes, exact preservation of normal localStorage, reset after exit/refresh, and retained real student material. Chapter browser checks cover readiness, focused questions, reload without timer extension, scoring, retry, no unit unlock, and readable mobile layouts. Screenshots were visually inspected; no page exceptions were recorded.
+
+Original course content is unchanged. The six new Drive PDFs are still download-restricted; summaries, new subject question banks, and local original-file downloads were not fabricated or claimed. See [handbook import status](HANDBOOK-IMPORT.md).
+
+## Direct entry, approved faculty, and weekly timetable — 6 November 2026
+
+Run from the folder containing `index.html`:
+
+```sh
+node tests/core.test.cjs
+node tests/focus.test.cjs
+node tests/learning.test.cjs
+node tests/timetable.test.cjs
+node --test tests/auth-server.test.cjs
+```
+
+The updated core suite passed **39 checks**, including student entry without
+details, persistent student re-entry, no old demo/registration bypass, rejected
+unapproved faculty, rejected legacy local faculty sessions, and accepted
+server-approved faculty. Existing learning, quiz, result, and faculty-post
+checks continue to pass. The six focus checks and learning-source checks pass.
+
+The timetable suite checks all six screenshot rows, empty periods, 32 unique
+weekly classes, 50/90-minute durations, Monday–Sunday week selection, and
+weekly calendar recurrence. The authorization server suite passed all nine
+tests, including unconfigured access, wrong/unapproved credentials, cross-origin
+rejection, HttpOnly sessions, revocation, logout, private-file isolation, and
+login rate limiting. All accounts used were temporary synthetic fixtures.
+
+Real Chrome checks using Playwright passed at 1440px desktop and 390px mobile:
+direct student entry, saved re-entry, timetable rendering and horizontal
+scrolling without page overflow, calendar download with 32 weekly recurrences,
+faculty rejection and approval, session restoration after reload, posting, and
+revocation. No JavaScript page exceptions occurred. Desktop/mobile entry,
+schedule, and faculty-form screenshots were visually inspected. The browser
+runner and screenshots were kept in temporary QA storage, outside the project.
+
+No real institutional accounts were created or verified. The institution and
+its identity provider have not been supplied. Faculty approval configuration
+is deliberately empty until an administrator provisions approved accounts.
+See [Faculty access](FACULTY-ACCESS.md). Publications and records still use
+browser storage; campus-wide data authorization and SSO were not implemented.
+
+## Historical verification — previous local-account edition
+
+The record below describes the previous version. Its local password/demo
+flows have been replaced by the entry and faculty checks described above.
+
 Verification record for the integrated learning, focus, campus, and faculty update, 23 October 2026.
 
 ## Automated checks completed

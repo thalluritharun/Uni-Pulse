@@ -6,6 +6,7 @@
     const kinds = {notes:'Notes', slides:'Slides / PPT', content:'Learning content', assignment:'Assignment', test:'Test / exam', notification:'Notification'};
     const kindIcons = {notes:'book', slides:'layers', content:'brain', assignment:'edit', test:'target', notification:'bell'};
     let filter = 'all', query = '', studentQuery = '', busy = false;
+    const demoFiles = new Map();
     const posts = () => Array.isArray(getDB().publications) ? getDB().publications : [];
     const own = post => getUser()?.role === 'faculty' && post.authorId === getUser().id;
     const subject = id => subjects.find(s => s.id === id);
@@ -17,7 +18,7 @@
     const size = bytes => bytes >= 1048576 ? `${(bytes / 1048576).toFixed(1)} MB` : `${Math.max(1,Math.ceil(bytes / 1024))} KB`;
     const title = (heading, sub, action='') => `<div class="page-title"><div><h1>${esc(heading)}</h1><p class="muted">${esc(sub)}</p></div>${action}</div>`;
     const publishButton = type => `<button class="btn" data-action="faculty-create" data-type="${type || 'notes'}">${icon('plus')}Create a post</button>`;
-    const localNotice = `<p class="faculty-local-note">${icon('circle')}Local workspace · Published posts and files are available to profiles in this browser. Campus-wide sharing needs a connected backend.</p>`;
+    const localNotice = () => api.isDemo?.() ? `<p class="faculty-local-note">${icon('circle')}Demo workspace · Fictional posts and student reports. Practice changes stay in this session.</p>` : `<p class="faculty-local-note">${icon('circle')}Local workspace · Published posts and files are available to profiles in this browser. Campus-wide sharing needs a connected backend.</p>`;
 
     function fileDB() {
       return new Promise((resolve,reject) => {
@@ -28,7 +29,8 @@
         request.onerror = () => reject(Error('Could not open file storage. Check browser storage permissions.'));
       });
     }
-    async function fileOp(action, value) {
+    async function fileOp(action, value, demo=!!api.isDemo?.()) {
+      if(demo){if(action==='get')return demoFiles.get(value);if(action==='put'){demoFiles.set(value.id,value);return value.id;}if(action==='delete'){demoFiles.delete(value);return;}}
       const db = await fileDB();
       return new Promise((resolve,reject) => {
         const tx = db.transaction('files',action === 'get' ? 'readonly' : 'readwrite');
@@ -67,11 +69,11 @@
       return rows.length ? `<div class="faculty-post-grid">${rows.map(p => card(p,true)).join('')}</div>` : `<div class="empty">${icon('book')}<h3>${query?'No matching posts':'Your teaching library starts here'}</h3><p>${query?'Try another title, keyword, or subject code.':'Add notes, attach slides, set an assignment, or share a class update.'}</p>${publishButton()}</div>`;
     }
     function materialsView() {
-      shell(title('Your teaching library.','Create, organise, and publish resources for your classes.',publishButton())+localNotice+`<div class="toolbar"><label class="faculty-search">${icon('search')}<input id="faculty-search" type="search" value="${esc(query)}" placeholder="Search your posts" aria-label="Search your posts"></label><label class="faculty-filter">Show<select id="faculty-filter"><option value="all">All posts</option><option value="draft" ${filter==='draft'?'selected':''}>Drafts</option>${Object.entries(kinds).map(([v,l])=>`<option value="${v}" ${filter===v?'selected':''}>${l}</option>`).join('')}</select></label></div><div id="faculty-post-list">${listPosts()}</div>`,'faculty-materials','Teaching library');
+      shell(title('Your teaching library.','Create, organise, and publish resources for your classes.',publishButton())+localNotice()+`<div class="toolbar"><label class="faculty-search">${icon('search')}<input id="faculty-search" type="search" value="${esc(query)}" placeholder="Search your posts" aria-label="Search your posts"></label><label class="faculty-filter">Show<select id="faculty-filter"><option value="all">All posts</option><option value="draft" ${filter==='draft'?'selected':''}>Drafts</option>${Object.entries(kinds).map(([v,l])=>`<option value="${v}" ${filter===v?'selected':''}>${l}</option>`).join('')}</select></label></div><div id="faculty-post-list">${listPosts()}</div>`,'faculty-materials','Teaching library');
     }
     function homeView() {
       const mine=posts().filter(own), publishedCount=mine.filter(p=>p.status==='published').length;
-      shell(title(`Hello, ${getUser().name.trim()}.`,'A little preparation. A lasting impact.',publishButton())+`<section class="welcome faculty-welcome"><div><div class="eyebrow">YOUR TEACHING STUDIO</div><h2>Give your next class a head start.</h2><p>Share a reading, set a challenge, and see how your students are progressing.</p><a class="btn" href="#faculty-materials">Open teaching library ${icon('arrow')}</a></div><div class="faculty-hero-mark" aria-hidden="true">${icon('cap')}</div></section>${localNotice}<div class="report-stats"><div class="stat"><span class="label">Published posts</span><strong>${publishedCount}</strong><small>Ready for student profiles</small></div><div class="stat"><span class="label">Drafts in progress</span><strong>${mine.length-publishedCount}</strong><small>Pick up where you left off</small></div><div class="stat"><span class="label">Student profiles</span><strong>${getDB().users.filter(u=>u.role==='student'&&!u.demo).length}</strong><small>Saved in this browser</small></div></div><div class="section-title"><h2>What would you like to share?</h2></div><div class="faculty-action-grid">${Object.entries(kinds).map(([kind,label])=>`<button class="feature faculty-type-action" data-action="faculty-create" data-type="${kind}"><span class="tile-icon ${kind==='test'?'peach':'lavender'}">${icon(kindIcons[kind])}</span><h3>${label}</h3><p>${{notes:'Everyday notes, ready to download.',slides:'Bring your class presentations together.',content:'A full explanation, in your own words.',assignment:'A clear brief and a due date.',test:'Exam instructions and test papers.',notification:'Keep your class in the loop.'}[kind]}</p></button>`).join('')}</div><div class="section-title"><h2>Keep an eye on progress</h2><a href="#faculty-students">View student reports ${icon('arrow')}</a></div><div class="card"><div class="row between wrap"><div><h3>Meet students where they are.</h3><p class="muted small">Review lesson progress, quiz attempts, and recorded marks for local student profiles.</p></div><a class="btn secondary" href="#faculty-students">Explore reports ${icon('chart')}</a></div></div>`,'home','Faculty overview');
+      shell(title(`Hello, ${getUser().name.trim()}.`,'A little preparation. A lasting impact.',publishButton())+`<section class="welcome faculty-welcome"><div><div class="eyebrow">YOUR TEACHING STUDIO</div><h2>Give your next class a head start.</h2><p>Share a reading, set a challenge, and see how your students are progressing.</p><a class="btn" href="#faculty-materials">Open teaching library ${icon('arrow')}</a></div><div class="faculty-hero-mark" aria-hidden="true">${icon('cap')}</div></section>${localNotice()}<div class="report-stats"><div class="stat"><span class="label">Published posts</span><strong>${publishedCount}</strong><small>Ready for student profiles</small></div><div class="stat"><span class="label">Drafts in progress</span><strong>${mine.length-publishedCount}</strong><small>Pick up where you left off</small></div><div class="stat"><span class="label">Student profiles</span><strong>${api.isDemo?.()?3:getDB().users.filter(u=>u.role==='student'&&!u.demo).length}</strong><small>${api.isDemo?.()?'Fictional sample students':'Saved in this browser'}</small></div></div><div class="section-title"><h2>What would you like to share?</h2></div><div class="faculty-action-grid">${Object.entries(kinds).map(([kind,label])=>`<button class="feature faculty-type-action" data-action="faculty-create" data-type="${kind}"><span class="tile-icon ${kind==='test'?'peach':'lavender'}">${icon(kindIcons[kind])}</span><h3>${label}</h3><p>${{notes:'Everyday notes, ready to download.',slides:'Bring your class presentations together.',content:'A full explanation, in your own words.',assignment:'A clear brief and a due date.',test:'Exam instructions and test papers.',notification:'Keep your class in the loop.'}[kind]}</p></button>`).join('')}</div><div class="section-title"><h2>Keep an eye on progress</h2><a href="#faculty-students">View student reports ${icon('arrow')}</a></div><div class="card"><div class="row between wrap"><div><h3>Meet students where they are.</h3><p class="muted small">Review lesson progress, quiz attempts, and recorded marks for local student profiles.</p></div><a class="btn secondary" href="#faculty-students">Explore reports ${icon('chart')}</a></div></div>`,'home','Faculty overview');
     }
     function composer(id, type='notes') {
       if(getUser()?.role!=='faculty') return;
@@ -122,7 +124,8 @@
       if((form.getAttribute?.('id') || form.id)!=='faculty-post-form')return;
       event.preventDefault();
       if(getUser()?.role!=='faculty'||busy)return;
-      const author = {id:getUser().id,name:getUser().name};
+      if(!await api.authorizeFaculty())return;
+      const author = {id:getUser().id,name:getUser().name}, demoMode=!!api.isDemo?.();
       const data=new FormData(form), id=String(data.get('id') || ''), old=posts().find(p=>p.id===id && own(p));
       if(id&&!old)return;
       const error=document.getElementById('faculty-post-error');
@@ -138,16 +141,17 @@
       let fileId=old?.fileId || null, fileName=old?.fileName || '',fileSize=old?.fileSize || 0,newFile=null;
       try {
         if(data.get('removeFile')){fileId=null;fileName='';fileSize=0;}
-        if(hasFile){newFile=core.uid();await fileOp('put',{id:newFile,blob:file,name:file.name});fileId=newFile;fileName=file.name;fileSize=file.size;}
+        if(hasFile){newFile=core.uid();await fileOp('put',{id:newFile,blob:file,name:file.name},demoMode);fileId=newFile;fileName=file.name;fileSize=file.size;}
+        if (!await api.authorizeFaculty()) throw Error('Faculty authorization expired.');
         if (getUser()?.id !== author.id || getUser()?.role !== 'faculty') throw Error('Your profile changed before the upload finished. Sign in again to publish.');
         if (old && !posts().some(p => p.id === old.id && own(p))) throw Error('This post was removed while you were editing it. Create a new post instead.');
         const status=event.submitter?.value==='draft'?'draft':'published', now=new Date().toISOString();
         const record={id:old?.id || core.uid(),authorId:author.id,authorName:author.name,subjectId,type,title:heading,body,dueAt:due?new Date(due).toISOString():null,status,createdAt:old?.createdAt || now,updatedAt:now,publishedAt:status==='published'?(old?.publishedAt || now):null,fileId,fileName,fileSize};
         const next=old?posts().map(p=>p.id===old.id?record:p):[...posts(),record];
-        if(!commit(next)){if(newFile)await fileOp('delete',newFile);fail('Your post could not be saved. Free browser storage and try again.');return;}
-        if(old?.fileId&&old.fileId!==fileId)fileOp('delete',old.fileId).catch(()=>{});
-        closeModal();location.hash='faculty-materials';render();toast(status==='draft'?'Draft saved.':'Published to the local student workspace.');
-      } catch(e){if(newFile)await fileOp('delete',newFile).catch(()=>{});if(form.isConnected)fail(e.message);else toast(e.message);} finally {busy=false;if(form.isConnected)form.querySelectorAll('button').forEach(b=>b.disabled=false);}
+        if(!commit(next)){if(newFile)await fileOp('delete',newFile,demoMode);fail('Your post could not be saved. Free browser storage and try again.');return;}
+        if(old?.fileId&&old.fileId!==fileId)fileOp('delete',old.fileId,demoMode).catch(()=>{});
+        closeModal();location.hash='faculty-materials';render();toast(status==='draft'?'Draft saved.':api.isDemo?.()?'Published in the demo only.':'Published to the local student workspace.');
+      } catch(e){if(newFile)await fileOp('delete',newFile,demoMode).catch(()=>{});if(form.isConnected)fail(e.message);else toast(e.message);} finally {busy=false;if(form.isConnected)form.querySelectorAll('button').forEach(b=>b.disabled=false);}
     }
     document.addEventListener('submit',submitPost);
     document.addEventListener('input',e=>{if(e.target.id==='faculty-search'){query=e.target.value;document.getElementById('faculty-post-list').innerHTML=listPosts();}if(e.target.id==='faculty-student-search'){studentQuery=e.target.value;document.getElementById('faculty-student-list').innerHTML=studentCards();}});
@@ -156,14 +160,15 @@
       const button=e.target.closest('[data-action^="faculty-"]');if(!button||button.disabled)return;
       e.preventDefault();const action=button.dataset.action,id=button.dataset.id;
       if(action==='faculty-download'){await downloadFile(id);return;}
-      if(getUser()?.role!=='faculty')return;
+      if(getUser()?.role!=='faculty'||!await api.authorizeFaculty())return;
       if(action==='faculty-create')composer(null,button.dataset.type);
       if(action==='faculty-edit')composer(id);
-      if(action==='faculty-publish'){const post=posts().find(p=>p.id===id&&own(p));if(post&&commit(posts().map(p=>p===post?{...p,status:'published',publishedAt:new Date().toISOString()}:p))){render();toast('Published to the local student workspace.');}}
+      if(action==='faculty-publish'){const post=posts().find(p=>p.id===id&&own(p));if(post&&commit(posts().map(p=>p===post?{...p,status:'published',publishedAt:new Date().toISOString()}:p))){render();toast(api.isDemo?.()?'Published in the demo only.':'Published to the local student workspace.');}}
       if(action==='faculty-delete'){const post=posts().find(p=>p.id===id&&own(p));if(post)openModal('Delete this post?',`<p class="muted">${esc(post.title)} and its attachment will be removed from this browser.</p><div class="form-actions"><button class="btn secondary" data-action="close-modal">Cancel</button><button class="btn danger" data-action="faculty-delete-confirm" data-id="${esc(id)}">Delete post</button></div>`);}
       if(action==='faculty-delete-confirm'){const post=posts().find(p=>p.id===id&&own(p));if(post&&commit(posts().filter(p=>p.id!==id))){if(post.fileId)fileOp('delete',post.fileId).catch(()=>{});closeModal();render();toast('Post deleted.');}}
     });
     return {
+      resetDemo(){demoFiles.clear();filter='all';query='';studentQuery='';},
       view(route){if(getUser()?.role!=='faculty')return false;if(route==='home')homeView();else if(route==='faculty-materials')materialsView();else if(route.startsWith('faculty-students'))studentsView(route.split('/')[1]);else return false;return true;},
       studentMaterials,materialView,
       notifications:()=>published().filter(p=>p.type==='notification'),

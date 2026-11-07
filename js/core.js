@@ -13,6 +13,13 @@
   };
   const subjectProgress = (p,s) => s.units.length ? Math.round(s.units.reduce((n,u)=>n+unitProgress(p,s,u),0)/s.units.length) : 0;
   const quizReady = (p,s,u) => u.available && u.questions.length>=5 && u.topics.every(t=>stateFor(p,s,u).done.includes(t.id)) && unlocked(p,s,s.units.indexOf(u));
+  const topicIdFor = topic => typeof topic==='string' ? topic : topic?.id;
+  const chapterQuestions = (unit,topic) => unit?.questions?.filter(q=>q.topic===topicIdFor(topic)) || [];
+  const chapterReady = (p,s,u,topic) => {
+    const topicId=topicIdFor(topic),index=s.units.indexOf(u);
+    return !!(index>=0 && u.available && u.topics.some(t=>t.id===topicId) &&
+      chapterQuestions(u,topicId).length>=3 && stateFor(p,s,u).done.includes(topicId) && unlocked(p,s,index));
+  };
   const grandReady = (p,s) => s.units.length>0 && s.units.every(u=>u.available && u.questions.length>=5 && stateFor(p,s,u).passed);
   function shuffle(a, rng = Math.random) { const b=[...a]; for(let i=b.length-1;i>0;i--){const j=Math.floor(rng()*(i+1));[b[i],b[j]]=[b[j],b[i]];} return b; }
   function pickQuestions(unit,count=5) {
@@ -20,10 +27,15 @@
     const chosen=groups.slice(0,count).map(topic=>shuffle(unit.questions.filter(q=>q.topic===topic))[0]);
     return shuffle([...chosen,...shuffle(unit.questions.filter(q=>!chosen.includes(q))).slice(0,count-chosen.length)]);
   }
-  function makeAttempt(subject,unit) {
+  function makeAttempt(subject,unit,topic) {
     const grand=!unit;
-    const questions=grand ? shuffle(subject.units.flatMap(u=>pickQuestions(u,5))) : pickQuestions(unit,5);
-    return {id:uid(),subjectId:subject.id,unitId:unit?.id||'grand',questions,answers:{},index:0,startedAt:Date.now(),deadline:Date.now()+(grand?20:5)*60000};
+    const chapter=topic!==undefined && topic!==null,topicId=topicIdFor(topic);
+    if(chapter && (grand || !subject.units.includes(unit) || !unit.topics.some(t=>t.id===topicId) || chapterQuestions(unit,topicId).length<3)) {
+      throw new RangeError('This chapter needs at least three questions before a quiz can start.');
+    }
+    const questions=chapter ? shuffle(chapterQuestions(unit,topicId)).slice(0,5) : grand ? shuffle(subject.units.flatMap(u=>pickQuestions(u,5))) : pickQuestions(unit,5);
+    const startedAt=Date.now();
+    return {id:uid(),subjectId:subject.id,unitId:unit?.id||'grand',...(chapter?{topicId}:{}),questions,answers:{},index:0,startedAt,deadline:startedAt+(grand?20:5)*60000};
   }
   function scoreAttempt(a) {
     const correct=a.questions.filter(q=>a.answers[q.id]===q.answer).length;
@@ -38,5 +50,5 @@
   function weekDays(now=new Date()) {const d=new Date(now); d.setDate(d.getDate()-(d.getDay()+6)%7);return Array.from({length:7},(_,i)=>{const x=new Date(d);x.setDate(x.getDate()+i);return localDay(x);});}
   function gpa(records) {const rows=records.filter(r=>r.type==='endsem' && Number.isFinite(r.points) && r.credits>0);return rows.length ? (rows.reduce((s,r)=>s+r.points*r.credits,0)/rows.reduce((s,r)=>s+r.credits,0)).toFixed(2) : null;}
   function newProfile(name,identity,role='student',semester=1) {return {id:uid(),name,identity,role,currentSemester:semester,progress:{},attempts:[],activeQuiz:null,lastLesson:null,bookmarks:[],notes:{},events:[],results:[],activity:[],weeklyGoal:4,settings:{theme:'light',font:100,reading:false},createdAt:Date.now()};}
-  root.CompassCore={uid,localDay,stateFor,unlocked,unitProgress,subjectProgress,quizReady,grandReady,shuffle,pickQuestions,makeAttempt,scoreAttempt,currentUnit,streak,weekDays,gpa,newProfile};
+  root.CompassCore={uid,localDay,stateFor,unlocked,unitProgress,subjectProgress,quizReady,chapterQuestions,chapterReady,grandReady,shuffle,pickQuestions,makeAttempt,scoreAttempt,currentUnit,streak,weekDays,gpa,newProfile};
 })(globalThis);

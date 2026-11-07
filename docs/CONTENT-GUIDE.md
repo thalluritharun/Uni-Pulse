@@ -4,7 +4,9 @@ Keep IDs stable after students have started learning; progress, bookmarks, and a
 
 ## Preserve supplied material
 
-Import the complete source wording. Do not shorten, summarize, rewrite, or silently omit paragraphs, worked examples, tables, questions, answers, classroom tasks, or assignment briefs. Reorganizing source passages into existing topics and changing their presentation is allowed. Preserve the original files alongside the imported text so students can download them.
+Preserve existing lesson content and IDs. Do not rewrite or shorten the existing PEA 101 Unit 1 and PEA 103 source collections, or replace their original question banks.
+
+For the newly requested Google Drive material, the user explicitly permits summaries. Once the source files are accessible, organise summaries by the handbook's actual units and chapters, include worked examples and source references, and retain downloadable original files. Label new questions as practice questions authored from the supplied material. Do not invent source contents or chapter names from filenames. Current import access is recorded in [HANDBOOK-IMPORT.md](HANDBOOK-IMPORT.md).
 
 Current imports:
 
@@ -72,6 +74,8 @@ For a conventional lesson, every topic needs the structure below. Full-source to
 Use plain text, not HTML. Text is escaped during rendering. Use JavaScript string escaping or JSON-style double quotes when your content includes quotes.
 
 ## Questions
+
+Chapter quizzes use `CompassCore.chapterReady` and `makeAttempt(subject, unit, topic)`. They require the chapter to be read and at least three matching questions, selecting up to five. Attempts carry `topicId`; chapter passes must never set the unit's `passed` state. Unit and grand attempts retain their existing rules. Keep chapter attempts separate when calculating a unit quiz's best score.
 
 For an assessed unit, add at least five questions based on supplied material; a larger bank gives more variety. Reading-only units do not need a question bank. Each question needs a globally unique ID across the subject:
 

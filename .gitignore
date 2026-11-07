@@ -8,3 +8,8 @@
 *.log
 Thumbs.db
 .DS_Store
+
+# Private institution-approved accounts (never publish)
+.private/
+
+graphify-out/
